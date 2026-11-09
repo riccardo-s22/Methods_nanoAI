@@ -1,0 +1,60 @@
+"""
+SWCNT 3H injury score vs day-7 WB (NfL, NfH) — condition-level correlation.
+
+Each point = one condition. x = mean +/- SEM of swcnt_fc over ALL organoids of that condition
+(exp3/exp3_3H_organoid_scores.csv); y = mean +/- SEM of the WB residual (corr_wb_swcnt.xlsx, Sheet2).
+Organoid-level pairing is NOT used: the sheet places WB values next to the k lowest-scoring wells of
+each group (not the blotted organoids' own wells), so row pairs do not refer to the same organoid.
+Output: editable SVG (text as text, Arial), full figure + one file per panel.
+"""
+import os
+import numpy as np, openpyxl
+from scipy.stats import pearsonr, spearmanr
+import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
+plt.rcParams.update({"svg.fonttype": "none", "font.family": "sans-serif",
+                     "font.sans-serif": ["Arial", "DejaVu Sans"]})
+HERE = os.path.dirname(os.path.abspath(__file__))
+XLSX = "/mnt/c/Users/riccardo-s/Documents/CNT/TBI/corr_wb_swcnt.xlsx"
+CSV = os.path.join(HERE, "exp3_3H_organoid_scores.csv")   # TRUELOG RERUN scores
+OUT = os.path.join(HERE, "svg"); os.makedirs(OUT, exist_ok=True)
+
+LAB = {"sham": "Sham", "resv_sham": "Sham + Res", "mg132_sham": "Sham + MG132",
+       "tbi": "TBI", "resv_tbi": "TBI + Res", "mg132_tbi": "TBI + MG132"}
+COL = {"sham": "#2e86c1", "resv_sham": "#a9cce3", "mg132_sham": "#d2b4de",   # same as Fig 3
+       "tbi": "#cb4335", "resv_tbi": "#27ae60", "mg132_tbi": "#8e44ad"}
+
+import pandas as pd
+ws = openpyxl.load_workbook(XLSX, data_only=True)["Sheet2"]
+wb = pd.DataFrame([dict(group=r[4], NfL=r[11], NfH=r[12]) for r in ws.iter_rows(values_only=True)
+                   if r[0] in ("SHAM", "TBI")])
+sw = pd.read_csv(CSV)
+D = {g: {"swcnt": sw.loc[sw.group == g, "swcnt_fc"].values.astype(float),
+         "NfL": wb.loc[wb.group == g, "NfL"].values.astype(float),
+         "NfH": wb.loc[wb.group == g, "NfH"].values.astype(float)} for g in wb.group.unique()}
+G = [g for g in LAB if g in D]
+sem = lambda a: a.std(ddof=1) / np.sqrt(len(a))
+
+def panel(ax, m):
+    x = np.array([D[g]["swcnt"].mean() for g in G]); y = np.array([D[g][m].mean() for g in G])
+    for g, xi, yi in zip(G, x, y):
+        ax.errorbar(xi, yi, xerr=sem(D[g]["swcnt"]), yerr=sem(D[g][m]), fmt="o", ms=9, color=COL[g],
+                    mec="black", mew=0.7, ecolor="0.35", elinewidth=1, capsize=3, label=LAB[g], zorder=3)
+    k, b = np.polyfit(x, y, 1); xx = np.linspace(x.min() - 0.1, x.max() + 0.1, 50)
+    ax.plot(xx, k * xx + b, "--", color="0.4", lw=1.2, zorder=1)
+    r, p = pearsonr(x, y); rho, ps = spearmanr(x, y)
+    ax.text(0.97, 0.95, "Pearson r = %.2f (p = %.2g)\nSpearman ρ = %.2f (p = %.2g)\nn = 6 conditions"
+            % (r, p, rho, ps), transform=ax.transAxes, ha="right", va="top", fontsize=9)
+    ax.set_xlabel("SWCNT injury score, 3 h (fc; sham = 1, TBI = 2)")
+    ax.set_ylabel("%s, day 7 WB (residual vs sham)" % m)
+    ax.set_title(m); ax.spines[["top", "right"]].set_visible(False)
+    print("%s: Pearson r=%.3f p=%.3g | Spearman rho=%.3f p=%.3g" % (m, r, p, rho, ps))
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 4.4))
+for ax, m in zip(axes, ("NfL", "NfH")): panel(ax, m)
+axes[1].legend(frameon=False, fontsize=8, loc="lower left")
+fig.tight_layout()
+fig.savefig(os.path.join(OUT, "wb_swcnt_corr__full.svg"), bbox_inches="tight")
+for i, m in enumerate(("NfL", "NfH")):
+    f, a = plt.subplots(figsize=(5, 4.4)); panel(a, m); a.legend(frameon=False, fontsize=8, loc="lower left")
+    f.tight_layout(); f.savefig(os.path.join(OUT, "wb_swcnt_corr__panel_%s_%s.svg" % ("ab"[i], m)), bbox_inches="tight")
+print("saved", OUT)

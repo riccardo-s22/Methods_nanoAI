@@ -1,0 +1,168 @@
+# Coupling foundation AI with nanosensor profiling of organoid culture media for neuroprotective drug discovery
+
+Analysis code for Sirtori, Monroy Lopez, Roxbury and Fallini.
+
+Ryan Institute for Neuroscience and College of Engineering, University of Rhode Island.
+Correspondence: riccardo-s@uri.edu
+
+The pipeline links a Geneformer in-silico perturbation screen of a public human
+TBI single-nucleus RNA-seq cohort to (GT)15-ssDNA SWCNT nanosensor readouts of
+blast-injured human cortical organoids. This repository holds the scripts that
+produced the figures and reported statistics, **organized by Results section**.
+
+---
+
+## Layout
+
+| Directory | Results section | Figures |
+|---|---|---|
+| [`01_swcnt_blast_classification/`](01_swcnt_blast_classification) | SWCNT nano-sensor classifies blast TBI cortical organoid model | Fig. 1; Supp. Figs. 1–4 |
+| [`02_geneformer_in_silico_screen/`](02_geneformer_in_silico_screen) | TBI-induced dysregulation of the mechanical pathway … by a foundational transformer model | Fig. 2; Supp. Figs. 5–6 |
+| [`03_protein_corona_proteomics/`](03_protein_corona_proteomics) | SWCNT nano-sensor's corona carries brain-specific markers and shows condition-specific differences | Fig. 3 |
+| [`04_drug_response_prediction/`](04_drug_response_prediction) | SWCNT nanosensor enables early prediction of drugs' neuroprotective effect | Fig. 4; Supp. Figs. 7–10 |
+| [`shared/`](shared) | — | SVG regeneration harness used by sections 1 and 4 |
+
+Each section directory has its own README mapping every script to the panel or
+statistic it produces, in run order.
+
+Within a section:
+
+- top level — the analysis pipeline, in run order
+- `figures/` — scripts whose output is a published panel
+- `supporting_checks/` — robustness checks behind a methodological choice stated
+  in the paper; not themselves figures
+- `sensitivity_true_log_ratios/` — see *Chirality feature definition* below
+
+## Figure index
+
+| Panel | Script |
+|---|---|
+| Fig. 1a, 1b | `01_swcnt_blast_classification/exp2_analysis2.py` |
+| Fig. 1c | `01_swcnt_blast_classification/exp2_mixes.py`, `exp2_mix_intermediate.py` |
+| Fig. 1d | `01_swcnt_blast_classification/exp2_classifier_compare.py` |
+| Fig. 2a | `02_geneformer_in_silico_screen/figures/mt_cls_umap_RECONSTRUCTED.py` — **reconstruction**, see below |
+| Fig. 2b | `02_geneformer_in_silico_screen/figures/make_fig2_panelB.py` |
+| Fig. 3 | `03_protein_corona_proteomics/ms_analysis.py` |
+| Fig. 4a | no script — experimental timeline |
+| Fig. 4b | `04_drug_response_prediction/exp3_drug_axis.py` |
+| Fig. 4c | no script — representative western blots |
+| Fig. 4d–f | no script — GraphPad bar charts of day-7 densitometry |
+| Fig. 4g | `04_drug_response_prediction/exp3_3H_organoid_score.py` (scores; scatter assembled outside the script) |
+| Supp. Fig. 1 | `01_swcnt_blast_classification/exp2_analysis2.py` (`EXP2_TAG=2h`) |
+| Supp. Fig. 2 | `01_swcnt_blast_classification/figures/make_supp_auc_compute.py` → `make_supp_auc_figure.py` |
+| Supp. Fig. 3 | `01_swcnt_blast_classification/figures/exp2_chirality_classify.py` |
+| Supp. Fig. 4 | `01_swcnt_blast_classification/figures/make_suppfig4_dilution_readouts.py`, `make_suppfig4_gaussian_readouts.py` |
+| Supp. Fig. 5a | `02_geneformer_in_silico_screen/figures/umap_all_celltypes_expression.py` (gene-expression UMAP) |
+| Supp. Fig. 5b | `02_geneformer_in_silico_screen/figures/umap_excit_ft.py` (FT CLS embeddings) |
+| Supp. Fig. 5, metric panels | `02_geneformer_in_silico_screen/figures/make_suppfig5_model_metrics.py` |
+| Supp. Fig. 6 | `02_geneformer_in_silico_screen/04_pathway_enrichment/excit_pathway_heatmap_FT.py`, `excit_pathway_heatmap_MT.py` |
+| Supp. Fig. 7 | `04_drug_response_prediction/exp3_perm_power.py` |
+| Supp. Fig. 8 | `04_drug_response_prediction/exp3_drug_axis.py` |
+| Supp. Fig. 9 | no script — GraphPad bar charts from western-blot densitometry |
+| Supp. Fig. 10b–c | `04_drug_response_prediction/figures/plot_wb_swcnt_corr.py` |
+| Supp. Fig. 10a | no script — GraphPad |
+
+Western blots and their bar charts were quantified in ImageJ and plotted in
+GraphPad Prism; no code is involved and none is included.
+
+---
+
+## Reconstructed scripts
+
+**Seven scripts are reconstructions, not the code that produced the published
+results:** the six in `02_geneformer_in_silico_screen/.../mt_multitask_RECONSTRUCTED/`
+and `02_geneformer_in_silico_screen/figures/mt_cls_umap_RECONSTRUCTED.py`, which
+draws Figure 2a.
+
+The multi-task (MT) model's own pipeline lived in two cluster project
+directories (`Geneformer_Garza` and `Geneformer_JointPG`) that were deleted
+before this repository was assembled. No copy survives on the attached drives,
+in the cluster home directory, or in the three retained `/work` snapshots, all
+of which postdate the deletion. The MT *checkpoint* and its perturbation outputs
+are gone with it.
+
+Those seven files were rewritten from the published Methods, from project notes
+that record the architecture, hyperparameters and retained checkpoint, and
+against the Geneformer API as vendored in the project. They implement the
+documented procedure and are syntactically valid, but they have **not** been
+re-run against the original data, and they are not evidence that the published
+numbers are reproducible. Points the Methods and notes do not fix — the MT
+training seed, the number of depth-matching quantile bins, the MT chunk size,
+the raw-pickle naming pattern — are marked `UNRECORDED` in the files rather than
+filled with a plausible guess.
+
+Because the MT checkpoint is gone too, the reconstructed scripts cannot
+currently be re-run even with the data in hand.
+
+Every downstream MT script that *did* survive (`excit_pathway_heatmap_MT.py`,
+`excit_drug_crossmodel.py`, `compare_singlect_vs_jointpg.py`) is original code
+and is not marked.
+
+Everything outside those seven files is the original code, copied unmodified.
+
+---
+
+## Chirality feature definition
+
+The published chirality analyses compute pairwise features as
+`log10((H_i + 1e-6) / (H_j + 1e-6))`. Fitted peak intensities `H` are of order
+1e-14 to 1e-12, so that floor dominates the ratio and turns the features into
+scaled height *differences* rather than log ratios.
+
+`sensitivity_true_log_ratios/` re-runs the affected analyses with the true ratio
+`log10(H_i / H_j)` and no floor. All `H` are strictly positive in every cache, so
+no floor is needed. Nothing else changes — same caches, labels, seeds and
+pipelines. `04_drug_response_prediction/sensitivity_true_log_ratios/README_truelog.md`
+tabulates old against new for every affected statistic. The blast-classification
+result is unchanged (LOO AUC 1.00 at both time points); the drug-experiment
+chirality AUC moves from 0.938 to 0.887, and the day-7 NfL correlation loses
+nominal significance.
+
+The main text reports the floored values. The sensitivity re-run is included so
+the dependency is inspectable.
+
+---
+
+## Data
+
+Neither raw spectra nor sequencing data are in this repository.
+
+| Data | Source |
+|---|---|
+| Human cortical snRNA-seq | NCBI GEO [GSE209552](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE209552) (Garza et al. 2023) |
+| Geneformer-V2-104M | [ctheodoris/Geneformer](https://huggingface.co/ctheodoris/Geneformer) |
+| NIR spectra, corona proteomics, western blots | available from the corresponding author |
+
+Scripts carry the absolute paths of the machines they were run on — a Windows
+workstation (`/mnt/c/...`, `/mnt/d/...`) for the spectral and proteomic
+analyses, and the URI Unity cluster (`/work/pi_cfallini_uri_edu/...`) for the
+Geneformer work. They are left as they were run rather than rewritten into
+portable form, so paths need adjusting before re-use. Each section README lists
+the inputs its scripts expect.
+
+## Software
+
+Spectral analyses: Python 3.13, NumPy 2.5, SciPy 1.18, scikit-learn 1.9,
+pandas 3.0, matplotlib 3.11. Geneformer work: Python 3.10, scanpy 1.11.5,
+anndata 0.11.4, Geneformer V2, PyTorch with bf16 on single NVIDIA A100 80GB
+GPUs, Slurm array jobs. All statistical tests are two-sided.
+
+## Not included
+
+This repository holds the scripts behind the paper. Left out, and where they
+live in the source tree:
+
+- `exp1/` — a superseded pilot of the blast-classification experiment
+  (convolutional autoencoder on 16 vs 16 wells, `dim477` latent features). The
+  published analysis is the 32-vs-32 interleaved design in section 1.
+- `exp2_unsup*.py`, `exp2_zprime.py`, `exp3_zprime.py`, `exp3_umap.py`,
+  `exp3_pairdist.py`, `exp3_sham_mg132sham.py`, `exp3_vs_exp2_chirality.py`,
+  the ElasticNet variants and the 6 h and 7 d spectral time points —
+  exploratory analyses not reported.
+- the zero-shot in-silico perturbation pipeline on the pretrained model
+  (`scripts/02`–`11`, `perturb_cells_paperQC_nGene1000*.py`,
+  `zeroshot_20pct_top100_enrichr.py`) and its astrocyte, microglia and
+  oligodendrocyte arms. The paper's screen uses the two **fine-tuned** models.
+- `paper/reviewer_concerns/` — analyses written for a reviewer response, not
+  for the paper. Two of its scripts are published as Supp. Fig. 2 and appear
+  here under `01_swcnt_blast_classification/`.
