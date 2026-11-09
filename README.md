@@ -21,6 +21,7 @@ produced the figures and reported statistics, **organized by Results section**.
 | [`03_protein_corona_proteomics/`](03_protein_corona_proteomics) | SWCNT nano-sensor's corona carries brain-specific markers and shows condition-specific differences | Fig. 3 |
 | [`04_drug_response_prediction/`](04_drug_response_prediction) | SWCNT nanosensor enables early prediction of drugs' neuroprotective effect | Fig. 4; Supp. Figs. 7–10 |
 | [`shared/`](shared) | — | SVG regeneration harness used by sections 1 and 4 |
+| [`data/`](data) | all four | source spectra, proteomics report, Geneformer result tables |
 
 Each section directory has its own README mapping every script to the panel or
 statistic it produces, in run order.
@@ -125,20 +126,38 @@ the dependency is inspectable.
 
 ## Data
 
-Neither raw spectra nor sequencing data are in this repository.
+Source data is in [`data/`](data), in subdirectories matching the four Results
+sections — see [`data/README.md`](data/README.md) for formats, plate layouts and
+column schemas.
 
-| Data | Source |
+| Directory | Contents |
 |---|---|
-| Human cortical snRNA-seq | NCBI GEO [GSE209552](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE209552) (Garza et al. 2023) |
-| Geneformer-V2-104M | [ctheodoris/Geneformer](https://huggingface.co/ctheodoris/Geneformer) |
-| NIR spectra, corona proteomics, western blots | available from the corresponding author |
+| `data/01_swcnt_blast_classification/` | NIR excitation–emission spectra (2 h and 24 h reads), chirality peak features and permutation nulls |
+| `data/02_geneformer_in_silico_screen/` | FT in-silico perturbation statistics (4 arms), pathway-enrichment matrices (FT and MT), drug-signature enrichment and cross-model consensus tables |
+| `data/03_protein_corona_proteomics/` | Spectronaut 17 directDIA protein-group report |
+| `data/04_drug_response_prediction/` | NIR spectra of the drug experiment (3 h and 6 h), chirality peak feature tables, per-well disease-axis scores |
+
+Not in the repository, and why:
+
+- **DIA raw files** — 18 files, 3.4 GB, each 167–212 MB, so each exceeds GitHub's
+  100 MB per-file limit. Mass-spectrometry raw data belongs in a ProteomeXchange
+  repository (PRIDE) and should be deposited there for the paper. `data/` holds
+  the processed Spectronaut report.
+- **snRNA-seq data** — public, at NCBI GEO
+  [GSE209552](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE209552)
+  (Garza et al. 2023). The scripts in `01_dataset_preparation/` fetch and process it.
+- **Geneformer-V2-104M** — [ctheodoris/Geneformer](https://huggingface.co/ctheodoris/Geneformer).
+- **MT in-silico perturbation tables and the MT checkpoint** — deleted with the
+  cluster project directories; no copy survives. The MT model's derived pathway
+  and drug tables do survive and are included.
+- **Western blots and densitometry** — ImageJ and GraphPad Prism; available from
+  the corresponding author.
 
 Scripts carry the absolute paths of the machines they were run on — a Windows
-workstation (`/mnt/c/...`, `/mnt/d/...`) for the spectral and proteomic
-analyses, and the URI Unity cluster (`/work/pi_cfallini_uri_edu/...`) for the
-Geneformer work. They are left as they were run rather than rewritten into
-portable form, so paths need adjusting before re-use. Each section README lists
-the inputs its scripts expect.
+workstation (`/mnt/c/...`, `/mnt/d/...`) for the spectral and proteomic analyses,
+and the URI Unity cluster (`/work/pi_cfallini_uri_edu/...`) for the Geneformer
+work. They are left as they were run rather than rewritten into portable form,
+so paths need adjusting to point at `data/` before re-use.
 
 ## Software
 

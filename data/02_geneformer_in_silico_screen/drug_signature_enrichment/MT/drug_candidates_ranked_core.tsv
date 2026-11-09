@@ -1,0 +1,2 @@
+drug	n_terms	directions	sum_signal	best_adjp	max_OR	both_axes	artifact
+methamphetamine	1	down/inhibit	1.5017117332806578	0.03149838352839139	18.02844774273346	False	False

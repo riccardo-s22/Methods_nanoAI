@@ -177,3 +177,6 @@ Embeddings are the second-to-last-layer CLS token (768 dimensions), reduced with
 UMAP (`n_neighbors` 30, `min_dist` 0.3, cosine metric, `random_state` 0).
 Note that `emb_layer: -1` means the second-to-last layer in Geneformer's
 convention, not the last; the classification heads read the final layer.
+
+Source data for this section is in [`../data/02_geneformer_in_silico_screen`](../data/02_geneformer_in_silico_screen); see
+[`../data/README.md`](../data/README.md) for formats and column schemas.

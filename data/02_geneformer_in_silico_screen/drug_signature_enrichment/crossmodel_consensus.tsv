@@ -1,0 +1,9 @@
+drug	in_FT_core	both_axes_either	combined_signal	directions_FT	directions_MT	best_adjp_FT	best_adjp_MT	n_terms_FT	n_terms_MT
+resveratrol	True	False	19.74935978355967	down/inhibit	down/inhibit	4.5007403026385734e-07	2.6167998274065043e-08	2	2
+diclofenac	True	False	4.288606428802146	down/inhibit	down/inhibit	0.0066134156986614	0.0077797877609936	1	1
+vemurafenib	False	True	18.42747040421806	down/inhibit+up/activate	down/inhibit	0.0021527314171526	0.0016157741322585	4	4
+methamphetamine	False	False	29.272962692551406	down/inhibit	down/inhibit	0.0161461648533714	1.787364376740035e-09	1	5
+dexamethasone	False	False	6.645082746539005	down/inhibit	down/inhibit	0.0009038769862329	0.0086355586175622	1	2
+morphine	False	False	5.932051006533008	down/inhibit	down/inhibit	0.0161461648533714	0.0023370713954074	2	1
+vx	False	False	3.844293844332333	up/activate	down/inhibit	0.025423914047174	0.005629421196791	1	1
+sodium	False	False	3.485182996128497	down/inhibit	down/inhibit	0.0420580617813842	0.0077797877609936	1	1

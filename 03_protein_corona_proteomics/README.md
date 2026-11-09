@@ -63,3 +63,6 @@ otherwise.
 
 Requires `requests` (two g:Profiler REST endpoints), `statsmodels`, `scipy`,
 `pandas`, `matplotlib` and `adjustText`.
+
+Source data for this section is in [`../data/03_protein_corona_proteomics`](../data/03_protein_corona_proteomics); see
+[`../data/README.md`](../data/README.md) for formats and column schemas.

@@ -80,3 +80,6 @@ Five `.txt` files per time point, one per excitation wavelength (570, 640, 670,
 750, 780 nm), each 512 emission rows × 97 columns (column 0 = emission axis,
 columns 1–96 = the wells row-major). Well A1 is a synthetic 0→1000 ramp
 placeholder and is excluded by the loader.
+
+Source data for this section is in [`../data/01_swcnt_blast_classification`](../data/01_swcnt_blast_classification); see
+[`../data/README.md`](../data/README.md) for formats and column schemas.

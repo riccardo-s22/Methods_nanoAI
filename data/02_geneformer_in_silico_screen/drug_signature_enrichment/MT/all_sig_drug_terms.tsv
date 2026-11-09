@@ -1,0 +1,2 @@
+drug	direction	Term	Gene_set	Adjusted P-value	Odds Ratio	mlog10adjp	Genes
+methamphetamine	down/inhibit	methamphetamine 10836 mouse GSE30305 sample 2667	Drug_Perturbations_from_GEO_down	0.03149838352839139	18.02844774273346	1.5017117332806578	IGSF21;LINGO1;IPCEF1;HS3ST2

@@ -106,3 +106,6 @@ in the current SciPy — see *Known limitations*.
   so a small number of area values are not fitted areas.
 - The 66 pairwise log ratios of 12 quantities have rank 11, so a PCA asking for
   more than 11 components returns noise directions.
+
+Source data for this section is in [`../data/04_drug_response_prediction`](../data/04_drug_response_prediction); see
+[`../data/README.md`](../data/README.md) for formats and column schemas.
