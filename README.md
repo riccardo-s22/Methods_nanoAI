@@ -135,7 +135,7 @@ column schemas.
 | `data/01_swcnt_blast_classification/` | NIR excitation–emission spectra (2 h and 24 h reads), chirality peak features and permutation nulls |
 | `data/02_geneformer_in_silico_screen/` | FT in-silico perturbation statistics (4 arms), pathway-enrichment matrices (FT and MT), drug-signature enrichment and cross-model consensus tables |
 | `data/03_protein_corona_proteomics/` | Spectronaut 17 directDIA protein-group report |
-| `data/04_drug_response_prediction/` | NIR spectra of the drug experiment (3 h and 6 h), chirality peak feature tables, per-well disease-axis scores |
+| `data/04_drug_response_prediction/` | NIR spectra of the drug experiment (3 h read), chirality peak feature tables, per-well disease-axis scores |
 
 Not in the repository, and why:
 

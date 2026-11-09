@@ -9,7 +9,7 @@ scripts read.
 | `01_swcnt_blast_classification/` | NIR excitation–emission spectra, blast-classification experiment | 5.9 MB |
 | `02_geneformer_in_silico_screen/` | in-silico perturbation statistics, pathway and drug-signature enrichment tables | 24 MB |
 | `03_protein_corona_proteomics/` | Spectronaut DIA report | 1.7 MB |
-| `04_drug_response_prediction/` | NIR spectra of the drug experiment, chirality peak features, per-well scores | 13 MB |
+| `04_drug_response_prediction/` | NIR spectra of the drug experiment, chirality peak features, per-well scores | 6.3 MB |
 
 ---
 
@@ -160,13 +160,12 @@ holds the processed report only.
 
 ### spectra/
 
-Two plates — one sham, one blast — each read at two time points after SWCNT
-addition, at five excitation wavelengths: 20 files.
+Two plates — one sham, one blast — read 3 h after SWCNT addition at five
+excitation wavelengths: 10 files (`SHAM_EX_3_3H__*`, `TBI_EX3_3H__*`). This is
+the read analysed in the paper.
 
-| Files | Read |
-|---|---|
-| `SHAM_EX_3_3H__*`, `TBI_EX3_3H__*` | 3 h — **the read analysed in the paper** |
-| `SHAM_EX3_6H__*`, `TBI_EX3_6H__*` | 6 h — a second read of the same physical wells, not reported |
+The same wells were read again at 6 h. That read is not reported and is not
+included here.
 
 Format: 512 emission rows × 98 columns. Column 0 is the emission axis; column 1
 is a synthetic ramp marker and is excluded; the remaining columns are the wells.
@@ -193,7 +192,7 @@ The layout above is the corrected one, confirmed against lab records. Use
   pipeline reads this rather than refitting: refitting from the raw spectra fails
   under the installed SciPy, so this cache, not the `.txt` files, is the
   effective feature source for this section.
-- `exp3_{3H,6H}_chirality_peak_features.csv` — the same features as a flat table,
+- `exp3_3H_chirality_peak_features.csv` — the same features as a flat table,
   one row per well: group, plate row and column, 12 `gauss_max`, 12 `gauss_auc`,
   12 area fractions and the 66 pairwise log10 intensity ratios.
 
@@ -237,4 +236,6 @@ other two files let the dependency be inspected.
 - **MT in-silico perturbation tables** — deleted, see section 02 above.
 - **Western blot images and densitometry** — quantified in ImageJ, plotted in
   GraphPad Prism; available from the corresponding author.
-- **7-day spectral read** — a separate experiment, not reported in the paper.
+- **6-hour and 7-day spectral reads** — the 6 h read is a second read of the
+  same drug-experiment wells and the 7 d read a separate experiment; neither is
+  reported in the paper.
