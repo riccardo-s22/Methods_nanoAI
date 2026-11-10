@@ -33,19 +33,12 @@ safeguards (FDR via Wilcoxon vs random, n_cells_perturbed coverage,
 percent-of-start-cells coverage, mean-shift magnitude) are unaffected.
 
 =============================================================================
-RECONSTRUCTED SCRIPT - NOT THE ORIGINAL CODE THAT PRODUCED THE PUBLISHED RESULTS
+Rewritten from the Methods after the original MT code was lost. It documents the
+procedure but was not used to generate the published results.
 =============================================================================
-See ../../02_model_finetuning/mt_multitask_RECONSTRUCTED/mt_01_depth_match_garza.py
-for why the original is unavailable and what this reconstruction is based on.
-
-This file is the closest of the six reconstructions to the lost original,
-because the original's statistical core lives in `perturb_safeguards.py` - which
-DID survive, in the FT folder beside this one - and is imported here rather than
-rewritten. The surviving project note records that the 20% eligibility rule was
-"implemented in perturb_safeguards.py as compute_detection_fractions() +
-apply_eligibility_filter() (thresh=0.20), wired into both aggregate_garza_isp.py
-and aggregate_pineda_isp.py (DETECTION_THRESHOLD=0.20)". What is reconstructed
-here is the driver around those helpers, not the statistics themselves.
+The statistics (including the 20% eligibility rule) come from the original
+`perturb_safeguards.py` in the FT folder, which is imported here; only the driver
+around it was rewritten.
 
 UNRECORDED: the exact raw-pickle filename pattern the MT runs produced. The
 regex in `mt_parse_run()` follows the FT convention; adjust it to match the

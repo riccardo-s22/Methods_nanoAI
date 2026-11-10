@@ -21,15 +21,14 @@ Unlike the FT arms, the MT start-state nuclei were NOT subsampled: every
 held-out nucleus of the start state is perturbed.
 
 =============================================================================
-RECONSTRUCTED SCRIPT - NOT THE ORIGINAL CODE THAT PRODUCED THE PUBLISHED RESULTS
+Rewritten from the Methods after the original MT code was lost. It documents the
+procedure but was not used to generate the published results.
 =============================================================================
-See ../../02_model_finetuning/mt_multitask_RECONSTRUCTED/mt_01_depth_match_garza.py
-for why the original is unavailable and what this reconstruction is based on.
 
 UNRECORDED: the chunk size used to fit the MT arms inside the cluster wall-time
 limit is not stated for the MT model (the Methods give 56 nuclei per chunk for
 the FT model only). --chunk-size below defaults to the FT value so the script is
-runnable; it is a reconstruction choice.
+runnable; it is an assumption.
 
 Original file name: not recorded.
 =============================================================================

@@ -41,7 +41,7 @@ Within a section:
 | Fig. 1a, 1b | `01_swcnt_blast_classification/exp2_analysis2.py` |
 | Fig. 1c | `01_swcnt_blast_classification/exp2_mixes.py`, `exp2_mix_intermediate.py` |
 | Fig. 1d | `01_swcnt_blast_classification/exp2_classifier_compare.py` |
-| Fig. 2a | `02_geneformer_in_silico_screen/figures/mt_cls_umap_RECONSTRUCTED.py` — **reconstruction**, see below |
+| Fig. 2a | `02_geneformer_in_silico_screen/figures/mt_cls_umap_RECONSTRUCTED.py` (see note below) |
 | Fig. 2b | `02_geneformer_in_silico_screen/figures/make_fig2_panelB.py` |
 | Fig. 3 | `03_protein_corona_proteomics/ms_analysis.py` |
 | Fig. 4a | no script — experimental timeline |
@@ -68,38 +68,14 @@ GraphPad Prism; no code is involved and none is included.
 
 ---
 
-## Reconstructed scripts
+## Note on the MT scripts
 
-**Seven scripts are reconstructions, not the code that produced the published
-results:** the six in `02_geneformer_in_silico_screen/.../mt_multitask_RECONSTRUCTED/`
-and `02_geneformer_in_silico_screen/figures/mt_cls_umap_RECONSTRUCTED.py`, which
-draws Figure 2a.
-
-The multi-task (MT) model's own pipeline lived in two cluster project
-directories (`Geneformer_Garza` and `Geneformer_JointPG`) that were deleted
-before this repository was assembled. No copy survives on the attached drives,
-in the cluster home directory, or in the three retained `/work` snapshots, all
-of which postdate the deletion. The MT *checkpoint* and its perturbation outputs
-are gone with it.
-
-Those seven files were rewritten from the published Methods, from project notes
-that record the architecture, hyperparameters and retained checkpoint, and
-against the Geneformer API as vendored in the project. They implement the
-documented procedure and are syntactically valid, but they have **not** been
-re-run against the original data, and they are not evidence that the published
-numbers are reproducible. Points the Methods and notes do not fix — the MT
-training seed, the number of depth-matching quantile bins, the MT chunk size,
-the raw-pickle naming pattern — are marked `UNRECORDED` in the files rather than
-filled with a plausible guess.
-
-Because the MT checkpoint is gone too, the reconstructed scripts cannot
-currently be re-run even with the data in hand.
-
-Every downstream MT script that *did* survive (`excit_pathway_heatmap_MT.py`,
-`excit_drug_crossmodel.py`, `compare_singlect_vs_jointpg.py`) is original code
-and is not marked.
-
-Everything outside those seven files is the original code, copied unmodified.
+The seven `*_RECONSTRUCTED` scripts (the six in
+`02_geneformer_in_silico_screen/.../mt_multitask_RECONSTRUCTED/` and
+`02_geneformer_in_silico_screen/figures/mt_cls_umap_RECONSTRUCTED.py`) were
+rewritten from the Methods after the original MT code was lost. They document
+the procedure but were not used to generate the published results, and the MT
+checkpoint they need is not available. All other scripts are the original code.
 
 ---
 
@@ -147,9 +123,8 @@ Not in the repository, and why:
   [GSE209552](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE209552)
   (Garza et al. 2023). The scripts in `01_dataset_preparation/` fetch and process it.
 - **Geneformer-V2-104M** — [ctheodoris/Geneformer](https://huggingface.co/ctheodoris/Geneformer).
-- **MT in-silico perturbation tables and the MT checkpoint** — deleted with the
-  cluster project directories; no copy survives. The MT model's derived pathway
-  and drug tables do survive and are included.
+- **MT in-silico perturbation tables and the MT checkpoint** — not available.
+  The MT model's derived pathway and drug tables are included.
 - **Western blots and densitometry** — ImageJ and GraphPad Prism; available from
   the corresponding author.
 

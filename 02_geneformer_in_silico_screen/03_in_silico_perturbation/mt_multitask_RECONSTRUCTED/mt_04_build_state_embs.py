@@ -21,10 +21,9 @@ Two points worth keeping in view when reading this script:
     mean is taken over all of them.
 
 =============================================================================
-RECONSTRUCTED SCRIPT - NOT THE ORIGINAL CODE THAT PRODUCED THE PUBLISHED RESULTS
+Rewritten from the Methods after the original MT code was lost. It documents the
+procedure but was not used to generate the published results.
 =============================================================================
-See ../../02_model_finetuning/mt_multitask_RECONSTRUCTED/mt_01_depth_match_garza.py
-for why the original is unavailable and what this reconstruction is based on.
 
 Original file name: build_state_embs.py
 =============================================================================

@@ -27,20 +27,11 @@ All 9,428 nuclei are embedded - this is the whole depth-matched corpus, not a
 sample drawn for the figure.
 
 =============================================================================
-RECONSTRUCTED SCRIPT - NOT THE ORIGINAL CODE THAT PRODUCED THE PUBLISHED FIGURE
+Rewritten from the Methods after the original MT code was lost. It documents the
+procedure but was not used to generate the published figure.
 =============================================================================
-The MT pipeline lived in two cluster project directories (Geneformer_Garza and
-Geneformer_JointPG) that were deleted before this repository was assembled; no
-copy survives on the attached drives, in the cluster home directory, or in the
-three retained /work snapshots, all of which postdate the deletion. The MT
-checkpoint itself is gone with them, so this script cannot currently be run to
-completion even with the data in hand.
-
-Rewritten from the published Methods and figure legend and against the
-Geneformer API as vendored under models/Geneformer. The sibling
-`umap_excit_ft.py` in this directory is the ORIGINAL script for the equivalent
-FT panel (Supplementary Figure 5b) and was used as the template for the plotting
-conventions here.
+The MT checkpoint is not available, so this script cannot be run to completion.
+Plotting conventions follow `umap_excit_ft.py` (Supplementary Figure 5b).
 
 UNRECORDED: the exact styling of the published panel (marker sizes, palette,
 "outlined by cell type" rendering). What follows is a faithful implementation of

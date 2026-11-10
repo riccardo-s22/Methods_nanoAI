@@ -19,13 +19,9 @@ induction × delete and overexpress). Pathway drivers went to Enrichr
 over-representation; a stricter high-confidence target set went to
 connectivity-map drug-signature enrichment, intersected across the two models.
 
-> **Seven scripts here are reconstructions.** The MT model's own pipeline was
-> deleted from the cluster before this repository was assembled and no copy
-> survives — nor does the MT checkpoint, so these scripts cannot currently be
-> re-run even with the data in hand. They are the six files in
-> `*/mt_multitask_RECONSTRUCTED/` plus `figures/mt_cls_umap_RECONSTRUCTED.py`.
-> See the repository README and each file's header. All other scripts in this
-> section are original.
+> The seven `*_RECONSTRUCTED` scripts were rewritten from the Methods after the
+> original MT code was lost; they document the procedure but were not used to
+> generate the published results. All other scripts in this section are original.
 
 ## 00_environment/
 
@@ -61,7 +57,7 @@ Shared by both models.
 | `13_extract_state_embs_finetuned.py` + `run_*.sh` | TBI and control state-embedding centroids from the FT model. |
 | `finetuned_celltype_config.py` | Per-cell-type paths and labels shared by the ISP stages. |
 
-**`mt_multitask_RECONSTRUCTED/`** — reconstructions, in run order:
+**`mt_multitask_RECONSTRUCTED/`** — in run order:
 `mt_01_depth_match_garza.py` (quantile-binned depth matching within cell type),
 `mt_02_donor_split_garza.py` (one donor held out per condition; 80/20 train/valid
 at seed 42), `mt_03_finetune_garza.py` (`MTLClassifier`, three heads, the
@@ -166,7 +162,7 @@ cannot be separated.
 
 | Script | Output |
 |---|---|
-| `mt_cls_umap_RECONSTRUCTED.py` | **Figure 2a**. MT second-to-last-layer CLS embeddings of all 9,428 depth-matched nuclei, colored by disease state and outlined by cell type. **Reconstruction** — the original is among the deleted MT scripts. |
+| `mt_cls_umap_RECONSTRUCTED.py` | **Figure 2a**. MT second-to-last-layer CLS embeddings of all 9,428 depth-matched nuclei, colored by disease state and outlined by cell type. Rewritten; see note above. |
 | `umap_all_celltypes_expression.py` | **Supplementary Figure 5a**. Gene-expression UMAP of all 15,172 QC-passing nuclei (2,000 HVGs, 30 PCs), colored by annotated cell type. Standard scanpy workflow on raw counts, no batch correction, so donor structure stays visible and judgeable. |
 | `umap_excit_ft.py` | **Supplementary Figure 5b**. FT excitatory CLS embeddings by condition. |
 | `make_suppfig5_model_metrics.py` | **Supplementary Figure 5**, metric panels. Confusion matrices and metric tables for both models. |

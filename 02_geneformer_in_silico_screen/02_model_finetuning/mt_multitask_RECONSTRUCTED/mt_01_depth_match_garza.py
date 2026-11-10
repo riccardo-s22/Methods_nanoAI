@@ -10,20 +10,10 @@ Published effect of this step (Methods, "Multi-task fine-tuning"):
     cell type, from 6,947 counts in excitatory neurons.
 
 =============================================================================
-RECONSTRUCTED SCRIPT - NOT THE ORIGINAL CODE THAT PRODUCED THE PUBLISHED RESULTS
+Rewritten from the Methods after the original MT code was lost. It documents the
+procedure but was not used to generate the published results.
 =============================================================================
-The original MT pipeline lived in two Unity project directories
-(Geneformer_Garza and Geneformer_JointPG) that were deleted before this
-repository was assembled. No copy survives on the attached drives, in the
-cluster home directory, or in the three retained /work snapshots
-(2026-11-06/07/08 - all postdate the deletion).
-
-This file was rewritten from (a) the published Methods, (b) surviving project
-notes that record the architecture, hyperparameters and retained checkpoint,
-and (c) the Geneformer API as vendored under models/Geneformer. It implements
-the documented procedure, but it has not been re-run against the original data.
-Values the Methods and notes do not fix are marked UNRECORDED rather than
-guessed.
+Values the Methods do not fix are marked UNRECORDED rather than guessed.
 
 Original file name: 01b_depth_match_garza.py
 =============================================================================

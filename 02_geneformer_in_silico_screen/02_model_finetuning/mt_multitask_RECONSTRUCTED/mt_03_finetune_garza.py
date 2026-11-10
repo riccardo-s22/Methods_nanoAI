@@ -35,12 +35,10 @@ checkpoint was selected on a validation split. The paper states this; it is
 repeated here so the script is not read as implementing a clean holdout.
 
 =============================================================================
-RECONSTRUCTED SCRIPT - NOT THE ORIGINAL CODE THAT PRODUCED THE PUBLISHED RESULTS
+Rewritten from the Methods after the original MT code was lost. It documents the
+procedure but was not used to generate the published results.
 =============================================================================
-See mt_01_depth_match_garza.py for why the original is unavailable and what this
-reconstruction is based on.
-
-Two reconstruction caveats specific to this file:
+Caveats:
 
   1. The TRAINING SEED is UNRECORDED. Neither the Methods nor the surviving
      notes state it, so an exact numerical reproduction of the published
@@ -50,7 +48,7 @@ Two reconstruction caveats specific to this file:
   2. Geneformer's MTLClassifier does not expose a save_steps argument or a
      per-checkpoint held-out evaluation loop. The original pipeline wrapped the
      library with its own loop, writing per-step results under
-     `heldout_eval_per_step/step<N>/`; that wrapper is part of what was lost.
+     `heldout_eval_per_step/step<N>/`; that wrapper is not available.
      `select_checkpoint()` below re-implements the documented selection rule
      over whatever per-step evaluation files are present, rather than pretending
      the library performs the sweep.

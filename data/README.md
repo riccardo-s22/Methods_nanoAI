@@ -91,11 +91,9 @@ Columns:
 donors. It is **not** available for the MT screen, which held out one donor per
 condition — see below.
 
-**The MT model's in-silico perturbation tables are not included because they no
-longer exist.** They lived under `Geneformer_JointPG/results/isp/`, in one of the
-two cluster project directories that were deleted; no copy survives. The MT
-model's *derived* outputs do survive and are included — its pathway-enrichment
-matrix and its drug-candidate tables below.
+The MT model's in-silico perturbation tables are not available. Its derived
+outputs are included — its pathway-enrichment matrix and its drug-candidate
+tables below.
 
 ### pathway_enrichment/
 
@@ -232,8 +230,8 @@ other two files let the dependency be inspected.
 - **Model weights** — Geneformer-V2-104M is at
   [ctheodoris/Geneformer](https://huggingface.co/ctheodoris/Geneformer). The
   fine-tuned FT checkpoint is available from the corresponding author; the MT
-  checkpoint was deleted and no copy survives.
-- **MT in-silico perturbation tables** — deleted, see section 02 above.
+  checkpoint is not available.
+- **MT in-silico perturbation tables** — not available, see section 02 above.
 - **Western blot images and densitometry** — quantified in ImageJ, plotted in
   GraphPad Prism; available from the corresponding author.
 - **6-hour and 7-day spectral reads** — the 6 h read is a second read of the

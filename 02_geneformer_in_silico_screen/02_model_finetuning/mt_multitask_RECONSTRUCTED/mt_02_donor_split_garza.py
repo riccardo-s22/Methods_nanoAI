@@ -15,10 +15,9 @@ consistency safeguard is undefined (NaN) for every gene in the MT screen and is
 neither filtered on nor reported.
 
 =============================================================================
-RECONSTRUCTED SCRIPT - NOT THE ORIGINAL CODE THAT PRODUCED THE PUBLISHED RESULTS
+Rewritten from the Methods after the original MT code was lost. It documents the
+procedure but was not used to generate the published results.
 =============================================================================
-See mt_01_depth_match_garza.py for why the original is unavailable and what this
-reconstruction is based on.
 
 Original file name: 01c_donor_split_garza.py
 =============================================================================
