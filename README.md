@@ -214,15 +214,29 @@ and proteomic analyses, the URI Unity cluster for the Geneformer work), is commi
 
 ## Software
 
-Spectral analyses: Python 3.13, NumPy 2.5, SciPy 1.18, scikit-learn 1.9,
-pandas 3.0, matplotlib 3.11. The split-Gaussian peak fitting behind the cached
-chirality features was run earlier, in Python 3.10 with NumPy 2.2.6 and SciPy
-1.15.3. The scripts of section 01 fix `random_state = 0` for PCA, the linear SVM
-and the saga solver; the figure panels were generated before these seeds were
-added, so regenerated values can differ from the published panels in the third
-decimal. Geneformer work: Python 3.10, scanpy 1.11.5,
-anndata 0.11.4, Geneformer V2, PyTorch with bf16 on single NVIDIA A100 80GB
-GPUs, Slurm array jobs. All statistical tests are two-sided.
+The analyses were run with more than one software stack. The table lists each
+version combination, what it runs, and whether it was rerun for this repository.
+
+| Combination | Versions | Runs | Status |
+|---|---|---|---|
+| **A. Spectral** ([`envs/spectral.yml`](envs/spectral.yml)) | Python 3.13.13, NumPy 2.5.1, SciPy 1.18.0, scikit-learn 1.9.0, pandas 3.0.3, matplotlib 3.11.0, joblib 1.5.3, statsmodels 0.15.0, gseapy 1.3.1 | sections 01, 03 and 04 from the cached peak features, and the CPU half of section 02: everything `bash reproduce.sh` runs | rerun in full; reproduces the values in [`docs/EXPECTED_RESULTS.md`](docs/EXPECTED_RESULTS.md) |
+| **B. Peak fitting** ([`envs/refit.yml`](envs/refit.yml)) | Python 3.10.20, NumPy 2.2.6, SciPy 1.15.3, scikit-learn 1.7.2, pandas 2.3.3, matplotlib 3.10.9 | the split-Gaussian fits behind the cached chirality features (`exp3_build_cache.py`, `exp3_peakfit.py`, `exp3_peakfit_ratios.py`) | rerun; regenerates the shipped drug-experiment cache bit for bit and prints the published AUCs (0.613 / 0.938 / 0.920). The rest of the pipeline was not rerun under this stack |
+| **C. Geneformer, as published** ([`envs/geneformer.yml`](envs/geneformer.yml)) | Python 3.10.18, PyTorch 2.7.1 (CUDA 11.8), transformers 4.46.3, datasets 4.8.5, accelerate 1.13.0, Geneformer V2, scanpy 1.11.5, anndata 0.11.4, NumPy 1.26.4, SciPy 1.15.2, scikit-learn 1.7.1, pandas 2.3.1, umap-learn 0.5.9.post2, gseapy 1.2.1 | dataset preparation, fine-tuning, in-silico perturbation and perturbation statistics of section 02 (GPU, Slurm array jobs, bf16) | the cluster environment of the published results; transcribed, not rerun here |
+| **D. Geneformer, CPU steps as rerun** | Python 3.10.20, NumPy 2.2.6, SciPy 1.15.3, scikit-learn 1.7.2, pandas 2.3.3, transformers 4.57.6, datasets 4.8.5, umap-learn 0.5.12 | the CPU-side steps of section 02 that need the project tree: h5ad build, QC sweep, perturbation statistics and candidate filter, detection table, confounder check, UMAP and cosine-shift figures | rerun; reproduces the original outputs, except the UMAP coordinates of Supp. Fig. 5b (see below) and the order of a few rows with exactly tied values |
+
+Combinations that do not work, or give different numbers:
+
+- **Peak fitting under A** stops with an error: the fit-failure fallback of the peak extractor
+  calls `numpy.trapz`, which NumPy 2.5 no longer has. With `numpy.trapz` restored, the refit runs
+  but does not return the cached features (ratio AUC 0.934 instead of 0.938). Use B to refit; A
+  reads the shipped cache and needs no refit.
+- **umap-learn 0.5.12 instead of 0.5.9.post2** gives different coordinates for the fine-tuned
+  embedding UMAP (Supp. Fig. 5b). Nuclei and labels are identical.
+- **gseapy 1.3.1 instead of 1.2.1** gives identical Enrichr statistics.
+
+The scripts of section 01 fix `random_state = 0` for PCA, the linear SVM and the saga solver;
+the figure panels were generated before these seeds were added, so regenerated values can
+differ from the published panels in the third decimal. All statistical tests are two-sided.
 
 Environment files, with exact versions, are in [`envs/`](envs):
 
