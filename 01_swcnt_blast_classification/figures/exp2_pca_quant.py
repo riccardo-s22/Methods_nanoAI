@@ -6,11 +6,15 @@ StandardScaler -> PCA. Reported per read (2 h, 24 h):
   PERMANOVA (Euclidean, full standardized space): pseudo-F, R2, permutation p (B = 9999)
   dispersion check (PERMDISP-like): distance of each well to its group centroid, permutation t-test
   k-means (k = 2, PC1-PC2) without labels: accuracy and ARI vs condition, ARI vs plate row
-Seed 0. Run: python exp2_pca_quant.py   (writes exp2_pca_quant_results.txt next to this file)
+Seed 0. Run: python exp2_pca_quant.py
+(writes results/01_swcnt_blast_classification/pca_quant/exp2_pca_quant_results.txt)
 """
 import os, sys
 for v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS"): os.environ[v] = "1"
-sys.path.insert(0, "/mnt/c/Users/riccardo-s/Documents/CNT/TBI/exp2")
+_HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(_HERE, ".."))                    # exp2_load.py
+sys.path.insert(0, os.path.join(_HERE, "..", "..", "shared"))
+from repo_paths import data_path, results_dir
 import importlib, numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
@@ -35,7 +39,7 @@ def disp(X, y, rng):
     return d[y == 0].mean(), d[y == 1].mean(), (c + 1) / (B + 1)
 
 for tp in ("2h", "24h"):
-    os.environ["EXP2_DIR"] = "/mnt/c/Users/riccardo-s/Documents/CNT/TBI/exp2/" + tp; os.environ["MIX_INVERTED"] = "1"
+    os.environ["EXP2_DIR"] = data_path("01_swcnt_blast_classification", "spectra", tp); os.environ["MIX_INVERTED"] = "1"
     import exp2_load; importlib.reload(exp2_load)
     cube, em = exp2_load.load_all(); rows, cols, grp = exp2_load.labels()
     m = np.isin(grp, ["sham", "TBI"]); y = (grp[m] == "TBI").astype(int); rr = rows[m]; C = cube[m].astype(float)
@@ -58,4 +62,4 @@ for tp in ("2h", "24h"):
     pr("  k-means (k=2, PC1-PC2, no labels): accuracy %.3f, ARI vs condition %+.3f, ARI vs plate row %+.3f"
        % (max((lab == y).mean(), (lab != y).mean()), ARI(y, lab), ARI(rr, lab)))
     pr()
-open(os.path.join(HERE, "exp2_pca_quant_results.txt"), "w").write("\n".join(OUT) + "\n")
+open(os.path.join(results_dir("01_swcnt_blast_classification", "pca_quant"), "exp2_pca_quant_results.txt"), "w").write("\n".join(OUT) + "\n")

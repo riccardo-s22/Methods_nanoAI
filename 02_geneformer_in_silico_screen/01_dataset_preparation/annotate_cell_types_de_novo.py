@@ -19,7 +19,12 @@ import pandas as pd
 import scanpy as sc
 from scipy import sparse
 
-BASE = Path("/mnt/d/TBI_SC/Geneformer_TBI")
+# Section path configuration (GF_WORK, GF_GEO, ...): see ../gf_paths.py.
+import os, sys  # noqa: E401
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import gf_paths  # noqa: E402
+
+BASE = Path(gf_paths.GF_WORK)
 IN = BASE / "h5ad/Garza_GSE209552_all_raw_counts_geneformer_ready.h5ad"
 OUT = BASE / "h5ad/Garza_GSE209552_all_raw_counts_annotated_geneformer_ready.h5ad"
 REPORT = BASE / "reports/cell_type_annotation_report.txt"

@@ -5,12 +5,14 @@ import os
 for v in ("OMP_NUM_THREADS","OPENBLAS_NUM_THREADS","MKL_NUM_THREADS"): os.environ[v]="1"
 import numpy as np, sys
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "shared"))
+from repo_paths import data_path, results_dir
 import exp2_load
 def pr(*a): print(*a); sys.stdout.flush()
 
-DIRS = {"2h": "/mnt/c/Users/riccardo-s/Documents/CNT/TBI/exp2/2h",
-        "24h": "/mnt/c/Users/riccardo-s/Documents/CNT/TBI/exp2/24h"}
+DIRS = {"2h": data_path("01_swcnt_blast_classification", "spectra", "2h"),
+        "24h": data_path("01_swcnt_blast_classification", "spectra", "24h")}
 
 def diff_spectrum(d):
     exp2_load.DIR = d
@@ -50,7 +52,7 @@ ax.set_title("exp2 — sham→TBI shape-difference spectrum: 2h vs 24h (same pla
              "cos(2h,24h)=%+.2f" % cos(d2[band], d24[band]))
 ax.legend()
 fig.tight_layout()
-OUT = os.environ.get("EXP2_OUT", "/mnt/c/Users/riccardo-s/Documents/CNT/targetALS/exp5/tbi_sham_tbi_outputs")
+OUT = os.environ.get("EXP2_OUT") or results_dir("01_swcnt_blast_classification")
 os.makedirs(OUT, exist_ok=True)
 p = os.path.join(OUT, "exp2_2h_vs_24h_diffspectrum.png"); fig.savefig(p, dpi=150)
 pr("saved", p)

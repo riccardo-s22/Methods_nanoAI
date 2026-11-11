@@ -3,7 +3,12 @@
 from pathlib import Path
 from geneformer import TranscriptomeTokenizer
 
-BASE = Path("/mnt/d/TBI_SC/Geneformer_TBI")
+# Section path configuration (GF_WORK, GF_GEO, ...): see ../gf_paths.py.
+import os, sys  # noqa: E401
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import gf_paths  # noqa: E402
+
+BASE = Path(gf_paths.GF_WORK)
 INPUTS = BASE / "h5ad/geneformer_inputs_paperQC_nGene1000"
 OUTDIR = BASE / "tokenized_paperQC_nGene1000"
 OUTDIR.mkdir(parents=True, exist_ok=True)

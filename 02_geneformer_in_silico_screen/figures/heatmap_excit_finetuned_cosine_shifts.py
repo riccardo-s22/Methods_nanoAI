@@ -7,7 +7,13 @@ delete arm (TBI->control). Parallel to the MT version
 Rows = top-N driver genes by mean_shift (eligible det>=20% via the shared
 layer3 detection table, positive shift). Columns = excitatory-neuron TBI cells.
 Value = cosine shift to control when the gene is deleted in that cell.
+
+Locations (see ../gf_paths.py): the raw chunk pickles below
+$GF_WORK/results/perturb_neurons_finetuned_tbi_to_control/chunks_delete/ and the
+detection table below $GF_JOINTPG; neither is shipped in data/. Output:
+<results>/02_geneformer_in_silico_screen/figures/.
 """
+import os
 import sys
 from pathlib import Path
 import numpy as np
@@ -16,22 +22,29 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-sys.path.insert(0, "/work/pi_cfallini_uri_edu/Geneformer_TBI/scripts")
-from perturb_safeguards import (make_parse_full_run, iter_per_cell_shifts, RunSpec)
+# Section path configuration (GF_WORK, results folder, shipped data): see ../gf_paths.py.
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import gf_paths  # noqa: E402
 
-TBI = "/work/pi_cfallini_uri_edu/Geneformer_TBI"
+# perturb_safeguards.py sits in 03_in_silico_perturbation/ft_excitatory in this
+# repository (the scripts were written for one flat scripts/ folder).
+gf_paths.add_ft_code_to_syspath()
+from perturb_safeguards import (make_parse_full_run, iter_per_cell_shifts, RunSpec)  # noqa: E402
+
+TBI = gf_paths.GF_WORK
 RUN = Path(f"{TBI}/results/perturb_neurons_finetuned_tbi_to_control")
 CHUNKS = RUN / "chunks_delete"
-UNF = RUN / "stats_delete/excit_finetuned_rescue_delete_unfiltered_all_gene_ranked.tsv"
-DET = ("/work/pi_cfallini_uri_edu/Geneformer_JointPG/results/isp/"
-       "garza_disease_binary_TBI_to_control/mechano_analysis/layer3/"
-       "garza_qc4_de_by_celltype.tsv")
+# $GF_WORK/results/.../stats_delete/excit_finetuned_rescue_delete_unfiltered_all_gene_ranked.tsv,
+# or the same table shipped in data/ when it is not below GF_WORK.
+UNF = Path(gf_paths.ft_stats_table("rescue_delete"))
+DET = gf_paths.MT_DETECTION_TABLE   # $GF_JOINTPG/results/isp/garza_disease_binary_TBI_to_control/mechano_analysis/layer3/garza_qc4_de_by_celltype.tsv
+OUTDIR = Path(gf_paths.gf_results_dir("figures"))
 CELLTYPE_PREFIX = "excit_finetuned_rescue"
 CELLS_PER_CHUNK = 56
 TOTAL_START = 2047
 THRESH = 0.20
 TOPN = 40
-OUT = str(RUN / "stats_delete/excit_finetuned_cosine_shift_heatmap.png")
+OUT = str(OUTDIR / "excit_finetuned_cosine_shift_heatmap.png")
 
 # eligibility via shared layer3 detection (excitatory_neuron)
 det = pd.read_csv(DET, sep="\t")
@@ -92,6 +105,6 @@ cb.set_label("cosine shift to control")
 fig.tight_layout()
 fig.savefig(OUT, dpi=140)
 print("wrote", OUT)
-np.savez_compressed(str(RUN / "stats_delete/excit_finetuned_cosine_shift_matrix.npz"),
+np.savez_compressed(str(OUTDIR / "excit_finetuned_cosine_shift_matrix.npz"),
                     matrix=M, genes=np.array([tok2sym[t] for t in gene_tokens]))
 print("wrote matrix npz")

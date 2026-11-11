@@ -3,8 +3,12 @@
 import os, sys, warnings, importlib.util
 for v in ("OMP_NUM_THREADS","OPENBLAS_NUM_THREADS","MKL_NUM_THREADS"): os.environ[v]="1"
 warnings.filterwarnings("ignore")
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "shared"))
+from repo_paths import data_path, results_dir, env_path
 import numpy as np, exp3_load as L
-PD="/mnt/c/Users/riccardo-s/Documents/CNT/targetALS/exp5/physical_descriptors"
+PD=os.path.join(os.path.dirname(os.path.abspath(__file__)),"vendored")
+# rebuilt caches are written under results/, never over the shipped cache in data/
+OUT=env_path("EXP3_OUT", "") or results_dir("04_drug_response_prediction", "rebuilt_cache"); os.makedirs(OUT, exist_ok=True)
 spec=importlib.util.spec_from_file_location("cie",os.path.join(PD,"chirality_interpolated_extraction.py"))
 cie=importlib.util.module_from_spec(spec); spec.loader.exec_module(cie)
 CHIR=cie.CHIRALITY_POSITIONS; EXC=np.array([570,640,670,750,780],float); exmin,exmax=EXC.min(),EXC.max()
@@ -28,5 +32,5 @@ for tp in ("3H","6H"):
         MX=np.zeros((len(idx),12)); AU=np.zeros((len(idx),12))
         for i,w in enumerate(idx): MX[i],AU[i]=well_chir(cube[w].astype(float),em)
         out[f"MX_{g}"]=MX; out[f"AU_{g}"]=AU
-    p="exp3_%s_peakfeats.npz"%tp; np.savez(p,**out); print("rebuilt",p,flush=True)
+    p=os.path.join(OUT,"exp3_%s_peakfeats.npz"%tp); np.savez(p,**out); print("rebuilt",p,flush=True)
 print("done")

@@ -13,7 +13,11 @@ WHY THIS EXISTS, AND HOW IT DIFFERS FROM excit_drug_repurpose_figure__panel_b.sv
   by a single SVG.
 
 DATA: the same file the published figure used --
-  /mnt/d/Unity/Geneformer_TBI/results/drug_repurpose/crossmodel_consensus.tsv
+  <project root>/results/drug_repurpose/crossmodel_consensus.tsv
+  In this repository it is looked up below
+  <results>/02_geneformer_in_silico_screen/drug_repurpose/ (a rerun of
+  excit_drug_crossmodel.py), then below $GF_WORK/results/drug_repurpose/, then in
+  data/02_geneformer_in_silico_screen/drug_signature_enrichment/ (shipped).
   (the composite PNG in main_figures.pptx is md5 c2d38bae5246680a4a76838853ab2333,
    identical to results/drug_repurpose/excit_drug_repurpose_figure.png)
 Nothing is traced off the raster and no value is retyped.
@@ -27,9 +31,11 @@ PRESENTATION follows the manuscript caption of Figure 2b rather than the composi
     does not define it. Set MARK_BOTH_AXES = True to restore it.
   - no panel title (the deck crops it off); the "adj. P = 0.05" line label is kept.
 
-Writes Figure2b_crossmodel_consensus.svg (editable text, Arial) and a .png preview.
+Writes Figure2b_crossmodel_consensus.svg (editable text, Arial) and a .png preview,
+to <results>/02_geneformer_in_silico_screen/figures/.
 """
 import os
+import sys
 import numpy as np
 import pandas as pd
 import matplotlib
@@ -37,9 +43,12 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 
-TSV = "/mnt/d/Unity/Geneformer_TBI/results/drug_repurpose/crossmodel_consensus.tsv"
-HERE = os.path.dirname(os.path.abspath(__file__))
-STEM = os.path.join(HERE, "Figure2b_crossmodel_consensus")
+# Section path configuration (GF_WORK, results folder, shipped data): see ../gf_paths.py.
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import gf_paths  # noqa: E402
+
+TSV = gf_paths.drug_table("crossmodel_consensus.tsv")
+STEM = os.path.join(gf_paths.gf_results_dir("figures"), "Figure2b_crossmodel_consensus")
 
 MARK_BOTH_AXES = False
 EXTRA_ARTIFACTS = {"vx", "sodium"}      # truncated non-therapeutic perturbagen names

@@ -15,9 +15,11 @@ Plate layout (README):
 Filenames (irregular): SHAM_EX_3_3H__{ex}.txt, SHAM_EX3_6H__{ex}.txt,
                        TBI_EX3_3H__{ex}.txt, TBI_EX3_6H__{ex}.txt
 """
-import numpy as np, glob, os
+import numpy as np, glob, os, sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "shared"))
+from repo_paths import data_path, env_path
 
-DIR = os.environ.get("EXP3_DIR", "/mnt/c/Users/riccardo-s/Documents/CNT/TBI/exp3")
+DIR = env_path("EXP3_DIR", data_path("04_drug_response_prediction", "spectra"))
 EXC = [570, 640, 670, 750, 780]
 ROWS = "ABCDEFGH"
 

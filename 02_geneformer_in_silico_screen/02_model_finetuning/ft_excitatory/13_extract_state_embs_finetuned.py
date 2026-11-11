@@ -18,7 +18,12 @@ import pickle
 import time
 from pathlib import Path
 
-BASE = Path("/work/pi_cfallini_uri_edu/Geneformer_TBI")
+# Section path configuration (GF_WORK, GF_MODEL_DIR, ...): see ../../gf_paths.py.
+import os, sys  # noqa: E401
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+import gf_paths  # noqa: E402
+
+BASE = Path(gf_paths.GF_WORK)
 TOKENIZED = BASE / "tokenized_paperQC_nGene1000/excitatory_neuron/GSE209552_excitatory_neurons_nGene1000.dataset"
 POINTER   = BASE / "results/finetune_tbi_excitatory/trained_model_path.txt"
 STATE_DIR = BASE / "results/perturb_neurons_finetuned_control_to_tbi/state_embs"
@@ -39,12 +44,14 @@ def main():
     STATE_DIR.mkdir(parents=True, exist_ok=True)
     cache = STATE_DIR / f"{OUTPUT_PREFIX}_state_embs.pkl"
 
-    if not POINTER.exists():
+    if not POINTER.exists() and not gf_paths.GF_FT_MODEL:
         raise FileNotFoundError(
             f"Pointer to fine-tuned model not found: {POINTER}. "
             f"Run scripts/12_finetune_tbi_classifier_excitatory.py first."
         )
-    MODEL_DIR = Path(POINTER.read_text().strip())
+    # GF_FT_MODEL if set, else the pointer (re-based onto GF_MODEL_DIR when the
+    # stored path is that of another machine); see gf_paths.resolve_model_pointer.
+    MODEL_DIR = Path(gf_paths.resolve_model_pointer(POINTER))
     if not MODEL_DIR.exists():
         raise FileNotFoundError(f"Fine-tuned model directory not found: {MODEL_DIR}")
 

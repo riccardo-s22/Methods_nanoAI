@@ -4,7 +4,10 @@ Primary: leave-one-well-out. Controls: leave-one-plate-row-out, leave-one-column
 PCA is refit INSIDE every fold (no leakage)."""
 import os, sys, json, itertools
 for v in ("OMP_NUM_THREADS","OPENBLAS_NUM_THREADS","MKL_NUM_THREADS","NUMEXPR_NUM_THREADS"): os.environ[v]="1"
-sys.path.insert(0,"/mnt/c/Users/riccardo-s/Documents/CNT/TBI/exp2")
+_HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(_HERE, ".."))                    # exp2_load.py
+sys.path.insert(0, os.path.join(_HERE, "..", "..", "shared"))
+from repo_paths import data_path, results_dir
 import numpy as np, warnings; warnings.filterwarnings("ignore")
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
@@ -24,8 +27,8 @@ CLFS = {"LDA (PCA20)":P20(LDA()),
         "Elastic-net (full 2560)":make_pipeline(StandardScaler(),LogisticRegression(penalty="elasticnet",solver="saga",l1_ratio=.5,C=.5,max_iter=20000))}
 NPERM=1000
 out={}
-for TAG,D in [("2h","/mnt/c/Users/riccardo-s/Documents/CNT/TBI/exp2/2h"),
-              ("24h","/mnt/c/Users/riccardo-s/Documents/CNT/TBI/exp2/24h")]:
+for TAG,D in [("2h",data_path("01_swcnt_blast_classification","spectra","2h")),
+              ("24h",data_path("01_swcnt_blast_classification","spectra","24h"))]:
     os.environ["EXP2_DIR"]=D
     for m in [k for k in list(sys.modules) if k.startswith("exp2_load")]: del sys.modules[m]
     from exp2_load import load_all, labels
@@ -72,4 +75,5 @@ for TAG,D in [("2h","/mnt/c/Users/riccardo-s/Documents/CNT/TBI/exp2/2h"),
     print("   PERMUTATION (well level, n=%d): obs=%.4f  null mean %.3f max %.3f  %d>=obs  p=%.4f"
           % (NPERM,obs,null.mean(),null.max(),c,(c+1)/(NPERM+1)))
     out[TAG]=r
-json.dump(out,open("final.json","w")); print("\nwrote final.json")
+JSON=os.path.join(results_dir("01_swcnt_blast_classification","supp_fig2_auc"),"supp_auc_results.json")
+json.dump(out,open(JSON,"w")); print("\nwrote",JSON)

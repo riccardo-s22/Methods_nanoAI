@@ -1,9 +1,11 @@
-import json, numpy as np, matplotlib
+import os, sys, json, numpy as np, matplotlib
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "shared"))
+from repo_paths import results_dir
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-SC="/tmp/claude-1000/-mnt-c-Users-riccardo-s-Documents-CNT-TBI-paper/d11f8982-dcb1-4407-b041-ecd50088264e/scratchpad"
-OUT="/mnt/c/Users/riccardo-s/Documents/CNT/TBI/paper/svg/supp_auc"
-d=json.load(open(f"{SC}/final.json"))
+# step 2 of 2: reads the JSON written by make_supp_auc_compute.py
+OUT=results_dir("01_swcnt_blast_classification","supp_fig2_auc")
+d=json.load(open(f"{OUT}/supp_auc_results.json"))
 INK,INK2,GRID="#0b0b0b","#52514e","#e5e4e0"; C_SHAM,C_TBI="#2a78d6","#eb6834"
 plt.rcParams.update({"font.family":"Arial","font.size":8,"axes.edgecolor":INK2,"axes.labelcolor":INK,
   "xtick.color":INK2,"ytick.color":INK2,"axes.spines.top":False,"axes.spines.right":False,

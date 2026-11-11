@@ -1,4 +1,9 @@
 #!/bin/bash
+# Submit from the repository root. The log paths below are relative, because
+# Slurm does not expand variables in #SBATCH lines, and the folder must exist:
+#   mkdir -p results/02_geneformer_in_silico_screen/logs
+#   sbatch 02_geneformer_in_silico_screen/03_in_silico_perturbation/ft_excitatory/run_perturb_array_finetuned_control_to_tbi_delete.sh
+# Site-specific: partition, GPU constraint, node exclusion, array range, CPUs, memory and wall time are those of the original run (URI Unity cluster); adapt them to your scheduler.
 #SBATCH --job-name=gf_ft_del
 #SBATCH -p uri-gpu,gpu
 #SBATCH --constraint=bf16
@@ -8,10 +13,10 @@
 #SBATCH --mem=32G
 #SBATCH -t 12:00:00
 #SBATCH --array=0-71
-#SBATCH --output=/work/pi_cfallini_uri_edu/Geneformer_TBI/logs/perturb_ft_del_%A_%a.out
-#SBATCH --error=/work/pi_cfallini_uri_edu/Geneformer_TBI/logs/perturb_ft_del_%A_%a.err
+#SBATCH --output=results/02_geneformer_in_silico_screen/logs/perturb_ft_del_%A_%a.out
+#SBATCH --error=results/02_geneformer_in_silico_screen/logs/perturb_ft_del_%A_%a.err
 #SBATCH --mail-type=END,FAIL
-#SBATCH --mail-user=riccardo-s@uri.edu
+# No --mail-user here: pass your own address on the command line (sbatch --mail-user=<address> ...).
 
 # Fine-tuned control→TBI perturbation, DELETE mode — excitatory neurons.
 # Array task N processes control cells [N*56 .. N*56+55] of the control-filtered
@@ -31,19 +36,25 @@
 #   - results/finetune_tbi_excitatory/trained_model_path.txt → fine-tuned checkpoint        ✓
 #   - results/perturb_neurons_finetuned_control_to_tbi/state_embs/excitatory_finetuned_state_embs.pkl  ✓
 #
-# Submit:
-#   sbatch scripts/run_perturb_array_finetuned_control_to_tbi_delete.sh
-#
 # After all 72 chunks complete:
-#   python scripts/05_get_perturb_stats_finetuned.py --mode delete
+#   sbatch 02_geneformer_in_silico_screen/03_in_silico_perturbation/ft_excitatory/run_05_get_perturb_stats_finetuned_delete.sh
 
 set -euo pipefail
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 export PERTURB_TYPE=delete
 
-ENV_PATH="/work/pi_cfallini_uri_edu/riccardo-s_uri_edu-conda/.conda/envs/myenv"
-PYTHON="${ENV_PATH}/bin/python"
-SCRIPT="/work/pi_cfallini_uri_edu/Geneformer_TBI/scripts/perturb_cells_finetuned_control_to_tbi.py"
+# Repository and section configuration (gf_env.sh documents every GF_* variable).
+# Under sbatch this script runs from a spool copy, so the repository is taken
+# from the submit directory, or from NANOAI_REPO if that is exported.
+GF_REPO="${NANOAI_REPO:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)}}"
+if [ ! -f "${GF_REPO}/02_geneformer_in_silico_screen/gf_env.sh" ]; then
+    echo "ERROR: repository not found at ${GF_REPO}; submit from the repository root or export NANOAI_REPO." >&2
+    exit 1
+fi
+source "${GF_REPO}/02_geneformer_in_silico_screen/gf_env.sh"
+
+PYTHON="${GF_PYTHON}"
+SCRIPT="${GF_SECTION_DIR}/03_in_silico_perturbation/ft_excitatory/perturb_cells_finetuned_control_to_tbi.py"
 
 T_START=$(date +%s)
 
@@ -71,5 +82,5 @@ echo ""
 echo "------------------------------------------------------------"
 echo "Task ${SLURM_ARRAY_TASK_ID} finished at: $(date)"
 echo "Elapsed: $(( ($(date +%s) - T_START) / 60 )) min"
-echo "Output:  /work/pi_cfallini_uri_edu/Geneformer_TBI/results/perturb_neurons_finetuned_control_to_tbi/chunks_delete/"
+echo "Output:  ${GF_WORK}/results/perturb_neurons_finetuned_control_to_tbi/chunks_delete/"
 nvidia-smi --query-gpu=name,memory.used,memory.free --format=csv,noheader 2>/dev/null || true

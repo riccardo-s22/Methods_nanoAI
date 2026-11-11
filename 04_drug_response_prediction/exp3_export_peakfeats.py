@@ -2,10 +2,13 @@
 Reads the per-timepoint npz caches (exp3_{TP}_peakfeats.npz) written by the analysis scripts.
 For each well: group, plate-row/col, 12 chirality gauss_max, 12 gauss_auc, 12 AUC-fractions,
 and 66 pairwise log10 intensity ratios. One CSV per timepoint + a combined CSV."""
-import os, numpy as np, pandas as pd
+import os, sys, numpy as np, pandas as pd
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "shared"))
+from repo_paths import data_path, results_dir, env_path
 from itertools import combinations
 import exp3_load as L
-OUT="/mnt/c/Users/riccardo-s/Documents/CNT/TBI/exp3"
+OUT=env_path("EXP3_OUT", "") or results_dir("04_drug_response_prediction"); os.makedirs(OUT, exist_ok=True)
+CACHE_DIR=env_path("EXP3_CACHE_DIR", data_path("04_drug_response_prediction", "chirality_features"))  # shipped cache, read-only
 ORDER=["ch8_3","ch6_5","ch7_5","ch10_2","ch9_4","ch8_4","ch7_6","ch8_6","ch8_7","ch9_5","ch10_3","ch10_5"]
 SH={k:k.replace("ch","").replace("_","_") for k in ORDER}   # 8_3, 6_5, ...
 PAIRS=list(combinations(range(12),2)); PNAME=[f"{SH[ORDER[a]]}/{SH[ORDER[b]]}" for a,b in PAIRS]
@@ -19,7 +22,7 @@ def gidx(g):
         "swcnt_noncm":"swcnt_noncm","tbi":"tbi","resv_tbi":"resv_tbi","mg132_tbi":"mg132_tbi"}[g] ]
 flo=1e-6
 def export(tp):
-    cache="exp3_%s_peakfeats.npz"%tp
+    cache=os.path.join(CACHE_DIR,"exp3_%s_peakfeats.npz"%tp)
     if not os.path.exists(cache): print("missing",cache); return None
     z=np.load(cache); rows=[]
     for g in GROUPS:

@@ -8,6 +8,8 @@ os.environ.setdefault("MIX_INVERTED", "1")
 for v in ("OMP_NUM_THREADS","OPENBLAS_NUM_THREADS","MKL_NUM_THREADS"): os.environ[v]="1"
 TAG = os.environ.get("EXP2_TAG", "2h")
 import numpy as np, sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "shared"))
+from repo_paths import results_dir
 from exp2_load import load_all, labels
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
@@ -109,7 +111,7 @@ ax.set_ylabel("rescaled classifier score  (sham=0, TBI=1)", fontsize=12)
 ax.set_title("exp2 / %s — dilution dose-response across classifiers\n(trained sham vs TBI; mixes projected; mean ± SEM)" % TAG, fontsize=12)
 ax.legend(fontsize=8.5, loc="upper left")
 fig.tight_layout()
-OUT = os.environ.get("EXP2_OUT", "/mnt/c/Users/riccardo-s/Documents/CNT/targetALS/exp5/tbi_sham_tbi_outputs")
+OUT = os.environ.get("EXP2_OUT") or results_dir("01_swcnt_blast_classification")
 os.makedirs(OUT, exist_ok=True)
 p = os.path.join(OUT, "exp2_%s_classifier_dose_compare.png" % TAG); fig.savefig(p, dpi=160)
 pr("\nsaved", p)

@@ -22,10 +22,15 @@ Per-celltype config (run_root, celltype_prefix) lives in
 Usage:
   python scripts/09_pathway_enrichment_finetuned.py --mode delete      [--celltype excit|oligo]
   python scripts/09_pathway_enrichment_finetuned.py --mode overexpress [--celltype excit|oligo]
+
+In this repository the script is 04_pathway_enrichment/09_pathway_enrichment_finetuned.py
+and <run_root> is $GF_WORK/results/perturb_neurons_finetuned_<direction> (see
+../gf_paths.py). It needs internet access (Enrichr).
 """
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
@@ -33,7 +38,14 @@ import gseapy as gp
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from finetuned_celltype_config import CELLTYPE_CONFIG, get_config
+# Section path configuration: see ../gf_paths.py. finetuned_celltype_config.py
+# sits in 02_model_finetuning/ft_excitatory in this repository (the scripts were
+# written for one flat scripts/ folder); add_ft_code_to_syspath() makes it importable.
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import gf_paths  # noqa: E402
+
+gf_paths.add_ft_code_to_syspath()
+from finetuned_celltype_config import CELLTYPE_CONFIG, get_config  # noqa: E402
 
 LIBRARIES = [
     "GO_Biological_Process_2023",

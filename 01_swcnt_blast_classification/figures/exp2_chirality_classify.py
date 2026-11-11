@@ -21,26 +21,29 @@ WHAT IT DOES
     exp3-3H: 12 fractions 0.613 | 66 ratios 0.938 | 78 combined 0.920
 
 CACHES READ (nothing is re-fitted for steps 1-3 and 5)
-  /mnt/c/Users/riccardo-s/Documents/CNT/targetALS/exp5/exp2_2h_peakfeats.npz
-  /mnt/c/Users/riccardo-s/Documents/CNT/targetALS/exp5/exp2_24h_peakfeats.npz
+  data/01_swcnt_blast_classification/chirality_features/exp2_2h_peakfeats.npz
+  data/01_swcnt_blast_classification/chirality_features/exp2_24h_peakfeats.npz
+  (folder overridable with EXP2_PEAKFEATS_DIR)
   keys: MXs/AUs = sham (32 wells x 12 chiralities), MXt/AUt = blast/TBI (32 x 12).
   Chirality column order is list(CHIRALITY_POSITIONS.keys()) from
-  targetALS/exp5/physical_descriptors/chirality_interpolated_extraction.py, i.e.
+  ../vendored/chirality_interpolated_extraction.py, i.e.
   (8,3) (6,5) (7,5) (10,2) (9,4) (8,4) (7,6) (8,6) (8,7) (9,5) (10,3) (10,5).
 
   *** DEVIATION, step 4 only ***
   The exp2 caches contain ONLY sham and blast. They hold NO dilution and NO negative-control
   wells, so the dose-response cannot be done from cache alone. This script therefore extracts
   the split-Gaussian maxima for the 24 dilution wells + 8 negctrl wells per timepoint with the
-  canonical extractor and stores them in exp2_<tp>_mix_peakfeats.npz next to this file (built
-  once, reused afterwards). Validation: re-extracting the 64 CACHED sham/blast wells with the
+  canonical extractor and stores them in exp2_<tp>_mix_peakfeats.npz (built once, reused
+  afterwards; the built copies are shipped in data/01_swcnt_blast_classification/
+  chirality_features/ and read from there, and are rebuilt into the output folder only if
+  they are missing from data/). Validation: re-extracting the 64 CACHED sham/blast wells with the
   same code in this environment reproduces the cached MX to a median relative error of ~1e-11
   (95th pct ~1e-3), so the dilution MX values are on the same footing as the cached ones.
   The sham/blast training features themselves are always the CACHED ones, never re-fitted.
   (AU does not reproduce as cleanly -- a handful of wells land in a different local optimum --
   which is why only MX-based ratios, never AU fractions, are used for the dilution analysis.)
 
-OUTPUTS (written next to this script)
+OUTPUTS (written to results/01_swcnt_blast_classification/supp_fig3_chirality/)
   exp2_chirality_results.txt
   exp2_chirality.png / exp2_chirality.svg
 
@@ -52,7 +55,7 @@ DILUTION PLATE LABELLING: exp2_load.py defaults to col10 = 75 % blast / col12 = 
   shape-vector dose-response. The opposite labelling is reported as a sensitivity.
 
 SEED: 0 everywhere (np.random.default_rng(0) for permutations, random_state=0 for PCA).
-RUN:  /home/riccardo-s/miniforge3/bin/python exp2_chirality_classify.py
+RUN:  python exp2_chirality_classify.py
 """
 import os, sys, warnings, importlib.util
 from itertools import combinations
@@ -75,9 +78,14 @@ import matplotlib.pyplot as plt
 SEED = 0
 B_PERM = 5000
 HERE = os.path.dirname(os.path.abspath(__file__))
-CACHE = "/mnt/c/Users/riccardo-s/Documents/CNT/targetALS/exp5"
-EXP2DIR = "/mnt/c/Users/riccardo-s/Documents/CNT/TBI/exp2"
-PD = "/mnt/c/Users/riccardo-s/Documents/CNT/targetALS/exp5/physical_descriptors"
+sys.path.insert(0, os.path.join(HERE, "..", "..", "shared"))
+from repo_paths import data_path, results_dir, env_path
+SHIPPED = data_path("01_swcnt_blast_classification", "chirality_features")   # read-only caches
+CACHE = env_path("EXP2_PEAKFEATS_DIR", SHIPPED)          # holds exp2_{2h,24h}_peakfeats.npz
+OUTDIR = results_dir("01_swcnt_blast_classification", "supp_fig3_chirality")   # everything written
+EXP2DIR = os.path.abspath(os.path.join(HERE, ".."))      # exp2_load.py
+SPECTRA = data_path("01_swcnt_blast_classification", "spectra")
+PD = os.path.join(EXP2DIR, "vendored")                   # chirality_interpolated_extraction.py
 
 # canonical chirality column order (= list(cie.CHIRALITY_POSITIONS.keys()))
 ORDER = ["ch8_3", "ch6_5", "ch7_5", "ch10_2", "ch9_4", "ch8_4",
@@ -131,8 +139,11 @@ def bh(p):
 
 # ---------------------------------------------------------------- dilution MX (step 4 only)
 def mix_MX(tp):
-    """MX for the 25/50/75 % dilution wells + negctrl. Cached in this folder after first build."""
-    cpath = os.path.join(HERE, "exp2_%s_mix_peakfeats.npz" % tp)
+    """MX for the 25/50/75 % dilution wells + negctrl. Read from the shipped cache in data/;
+    if it is not there, built once and cached in the output folder (data/ is never written)."""
+    cpath = os.path.join(SHIPPED, "exp2_%s_mix_peakfeats.npz" % tp)
+    if not os.path.exists(cpath):
+        cpath = os.path.join(OUTDIR, "exp2_%s_mix_peakfeats.npz" % tp)
     if os.path.exists(cpath):
         z = np.load(cpath)
         return {k: z[k] for k in z.files}
@@ -146,7 +157,7 @@ def mix_MX(tp):
     os.environ.setdefault("MIX_INVERTED", "1")                # paper convention, see below
     sys.path.insert(0, EXP2DIR)
     import exp2_load
-    exp2_load.DIR = os.path.join(EXP2DIR, tp)
+    exp2_load.DIR = os.path.join(SPECTRA, tp)
     cube, em = exp2_load.load_all()
     rows, cols, grp = exp2_load.labels()
 
@@ -210,7 +221,9 @@ def run(tp):
 
     # ---- 3 permutation test on the 66 ratios
     pr("\n=== [3] label-permutation test, 66 log-ratios -> PCA15, B=%d, seed=%d ===" % (B_PERM, SEED))
-    npath = os.path.join(HERE, "exp2_%s_permnull.npz" % tp)
+    npath = os.path.join(SHIPPED, "exp2_%s_permnull.npz" % tp)     # shipped null, read-only
+    if not os.path.exists(npath):                                 # not shipped: compute, cache with outputs
+        npath = os.path.join(OUTDIR, "exp2_%s_permnull.npz" % tp)
     if os.path.exists(npath):
         null = np.load(npath)["null"]
         pr("  (null distribution reloaded from exp2_%s_permnull.npz)" % tp)
@@ -363,7 +376,7 @@ def figure(res):
                  "(top row 2 h, bottom row 24 h)", fontsize=10)
     fig.tight_layout(rect=[0, 0, 1, 0.955])
     for ext in ("png", "svg"):
-        p = os.path.join(HERE, "exp2_chirality.%s" % ext)
+        p = os.path.join(OUTDIR, "exp2_chirality.%s" % ext)
         fig.savefig(p, dpi=300 if ext == "png" else None)
         pr("saved " + p)
 
@@ -385,6 +398,6 @@ if __name__ == "__main__":
     pr("  rho_mix: 2h %+.3f | 24h %+.3f   (shape-vector reference 0.86-0.94 at 24 h)" % (
         res[0]["rho_mix"], res[1]["rho_mix"]))
     figure(res)
-    with open(os.path.join(HERE, "exp2_chirality_results.txt"), "w") as f:
+    with open(os.path.join(OUTDIR, "exp2_chirality_results.txt"), "w") as f:
         f.write("\n".join(LOG) + "\n")
-    print("\nwrote", os.path.join(HERE, "exp2_chirality_results.txt"))
+    print("\nwrote", os.path.join(OUTDIR, "exp2_chirality_results.txt"))

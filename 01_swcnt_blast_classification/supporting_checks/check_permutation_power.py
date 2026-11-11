@@ -1,7 +1,10 @@
 """Power analysis for the permutation tests behind the blast-vs-sham AUC."""
 import os, sys, itertools
 for v in ("OMP_NUM_THREADS","OPENBLAS_NUM_THREADS","MKL_NUM_THREADS","NUMEXPR_NUM_THREADS"): os.environ[v]="1"
-sys.path.insert(0,"/mnt/c/Users/riccardo-s/Documents/CNT/TBI/exp2")
+_HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(_HERE, ".."))                    # exp2_load.py
+sys.path.insert(0, os.path.join(_HERE, "..", "..", "shared"))
+from repo_paths import data_path
 import numpy as np, warnings; warnings.filterwarnings("ignore")
 from math import comb
 from sklearn.pipeline import make_pipeline
@@ -58,8 +61,8 @@ print("\n  Power if the design had k columns per group (d fixed at the value obs
 print("\n"+"="*78)
 print("D.  OBSERVED column-level effect size in your data")
 print("="*78)
-for TAG,D in [("2h","/mnt/c/Users/riccardo-s/Documents/CNT/TBI/exp2/2h"),
-              ("24h","/mnt/c/Users/riccardo-s/Documents/CNT/TBI/exp2/24h")]:
+for TAG,D in [("2h",data_path("01_swcnt_blast_classification","spectra","2h")),
+              ("24h",data_path("01_swcnt_blast_classification","spectra","24h"))]:
     os.environ["EXP2_DIR"]=D
     for m in [k for k in list(sys.modules) if k.startswith("exp2_load")]: del sys.modules[m]
     from exp2_load import load_all, labels

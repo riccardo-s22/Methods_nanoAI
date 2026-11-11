@@ -1,0 +1,23 @@
+# Citation metadata for this repository. The paper is under review and has no DOI yet;
+# update `preferred-citation` when it is published. Author given names and ORCID iDs are
+# not listed in the repository README and are left for the authors to add.
+cff-version: 1.2.0
+message: "If you use this code or data, please cite the paper below."
+type: software
+title: "Coupling foundation AI with nanosensor profiling of organoid culture media for neuroprotective drug discovery"
+authors:
+  - family-names: Sirtori
+  - family-names: "Monroy Lopez"
+  - family-names: Roxbury
+  - family-names: Fallini
+repository-code: "https://github.com/riccardo-s22/Methods_nanoAI"
+preferred-citation:
+  type: unpublished
+  title: "Coupling foundation AI with nanosensor profiling of organoid culture media for neuroprotective drug discovery"
+  authors:
+    - family-names: Sirtori
+    - family-names: "Monroy Lopez"
+    - family-names: Roxbury
+    - family-names: Fallini
+  status: submitted
+  notes: "Manuscript under review; no DOI yet."

@@ -14,7 +14,16 @@ FT ranked tables with excit detection >=20%; re-run excit_drug_repurpose.py on
 Unity to print the canonical numbers and update them if they differ).
 
 Output: results/drug_repurpose/excit_drug_repurpose_figure.{png,pdf}
+
+In this repository the three input tables are looked up below
+<results>/02_geneformer_in_silico_screen/drug_repurpose/ (a rerun), then below
+$GF_WORK/results/drug_repurpose/ (the original project tree), then in
+data/02_geneformer_in_silico_screen/drug_signature_enrichment/ (shipped); the
+figure is written to <results>/02_geneformer_in_silico_screen/drug_repurpose/.
+See ../gf_paths.py.
 """
+import os
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -24,9 +33,11 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch
 
-BASE = Path(__file__).resolve().parents[1]
-DR = BASE / "results/drug_repurpose"
-OUT = DR / "excit_drug_repurpose_figure"
+# Section path configuration (GF_WORK, results folder, shipped data): see ../gf_paths.py.
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import gf_paths  # noqa: E402
+
+OUT = Path(gf_paths.gf_results_dir("drug_repurpose")) / "excit_drug_repurpose_figure"
 
 # non-therapeutic perturbagens whose truncated library names slipped past the
 # ARTIFACTS list in excit_drug_repurpose.py ("VX 39793" = VX nerve agent,
@@ -122,7 +133,7 @@ def panel_a(ax):
 
 
 def panel_b(ax):
-    d = pd.read_csv(DR / "crossmodel_consensus.tsv", sep="\t")
+    d = pd.read_csv(gf_paths.drug_table("crossmodel_consensus.tsv"), sep="\t")
     d = d[~d["drug"].isin(EXTRA_ARTIFACTS)].copy()
     d["ft"] = -np.log10(d["best_adjp_FT"])
     d["mt"] = -np.log10(d["best_adjp_MT"])
@@ -161,9 +172,9 @@ def panel_b(ax):
 
 
 def panel_c(ax):
-    d = pd.read_csv(DR / "FT/drug_candidates_ranked_core.tsv", sep="\t")
+    d = pd.read_csv(gf_paths.drug_table("FT", "drug_candidates_ranked_core.tsv"), sep="\t")
     d = d[~d["artifact"]].copy()
-    t = pd.read_csv(DR / "FT/all_sig_drug_terms.tsv", sep="\t")
+    t = pd.read_csv(gf_paths.drug_table("FT", "all_sig_drug_terms.tsv"), sep="\t")
     t["n_genes"] = t["Genes"].str.split(";").str.len()
     t["src"] = t["Term"].str.extract(r"(GSE\d+)")[0] + " · " + \
         t["Term"].str.extract(r"(human|mouse|rat)")[0]

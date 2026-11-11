@@ -16,10 +16,15 @@ from pathlib import Path
 import anndata as ad
 import numpy as np
 
-BASE       = Path("/work/pi_cfallini_uri_edu/Geneformer_TBI")
+# Section path configuration (GF_WORK, GF_GEO, ...): see ../gf_paths.py.
+import os, sys  # noqa: E401
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import gf_paths  # noqa: E402
+
+BASE       = Path(gf_paths.GF_WORK)
 SUBSETS    = BASE / "h5ad/celltype_subsets"
 TOKENIZED  = BASE / "tokenized"
-MODEL_DIR  = BASE / "models/Geneformer"
+MODEL_DIR  = Path(gf_paths.GF_MODEL_DIR)
 N_CHUNKS   = 6   # desired number of Slurm array tasks for excitatory neurons
 
 def count_detected_genes(h5ad_path: Path) -> dict:
@@ -115,6 +120,7 @@ if "excitatory_neuron" in results:
 
     # Save gene list for chunks
     gene_list_path = BASE / "results/perturb_neurons/excitatory_neuron_genes_to_perturb.json"
+    gene_list_path.parent.mkdir(parents=True, exist_ok=True)  # fresh GF_WORK: folder may not exist yet
     with open(gene_list_path, "w") as f:
         json.dump({
             "cell_type": "excitatory_neuron",

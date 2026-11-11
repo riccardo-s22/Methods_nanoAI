@@ -1,0 +1,36 @@
+# Conda environment for everything `bash reproduce.sh` runs by default:
+# sections 01, 03, 04 and the CPU half of section 02.
+#
+#     mamba env create -f envs/spectral.yml        (or: conda env create -f envs/spectral.yml)
+#     conda activate nanoai-spectral
+#     bash reproduce.sh
+#
+# The versions are those of the interpreter that reproduced the results in
+# docs/EXPECTED_RESULTS.md (queried from it, not copied from the paper), and they are the
+# versions the paper states for the spectral and protein corona analyses. On that machine the
+# scientific packages were installed with pip into a conda-forge Python, so this file does the
+# same: the wheels bring their own BLAS, which keeps the numerics as close as possible.
+# Only packages the scripts import are listed. Keep the pip list in step with
+# envs/requirements-spectral.txt.
+#
+# Not covered: refitting the chirality peaks from raw spectra (section 04, three scripts) needs
+# an older NumPy / SciPy, see envs/refit.yml. The Geneformer pipeline needs envs/geneformer.yml.
+name: nanoai-spectral
+channels:
+  - conda-forge
+dependencies:
+  - python=3.13.13
+  - pip
+  - pip:
+      - numpy==2.5.1
+      - scipy==1.18.0
+      - scikit-learn==1.9.0
+      - pandas==3.0.3
+      - matplotlib==3.11.0
+      - joblib==1.5.3
+      - pillow==12.3.0
+      - statsmodels==0.15.0
+      - requests==2.34.2
+      - gseapy==1.3.1
+      - adjustText==1.4.0
+      - openpyxl==3.1.5

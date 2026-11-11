@@ -16,58 +16,52 @@ methodology (mirrors mt_20pct_top100_enrichr.py) so the resulting per-arm
   - libraries incl. MSigDB_Hallmark_2020.
 
 Run with an arm label (excit only): MT_delete | FT_delete | FT_OE | MT_OE.
+
+Locations (see ../gf_paths.py): the detection table and the MT ranked tables are
+read below $GF_JOINTPG, the FT ranked tables below $GF_WORK (or, if absent there,
+from data/02_geneformer_in_silico_screen/in_silico_perturbation/), and the output
+goes to <results>/02_geneformer_in_silico_screen/pathway_heatmap/enrich/. The
+detection table is not shipped, so this script cannot run from a fresh clone.
 """
 import os
 import sys
 import pandas as pd
 import gseapy as gp
 
-JPG = "/work/pi_cfallini_uri_edu/Geneformer_JointPG"
-TBI = "/work/pi_cfallini_uri_edu/Geneformer_TBI"
-DET = (f"{JPG}/results/isp/garza_disease_binary_TBI_to_control/"
-       "mechano_analysis/layer3/garza_qc4_de_by_celltype.tsv")
+# Section path configuration (GF_WORK, results folder, shipped data): see ../gf_paths.py.
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import gf_paths  # noqa: E402
+
+JPG = gf_paths.GF_JOINTPG
+TBI = gf_paths.GF_WORK
+DET = gf_paths.MT_DETECTION_TABLE   # $GF_JOINTPG/results/isp/garza_disease_binary_TBI_to_control/mechano_analysis/layer3/garza_qc4_de_by_celltype.tsv
 CT = "excitatory_neuron"
 THRESH = 0.20
 FDR = 0.05
 LIBS = ["GO_Biological_Process_2026", "KEGG_2026",
         "Reactome_Pathways_2024", "MSigDB_Hallmark_2020"]
 
-OUTROOT = f"{TBI}/results/pathway_heatmap/enrich"
+OUTROOT = os.path.join(gf_paths.GF_RESULTS, "pathway_heatmap", "enrich")
 
 # label -> ranked-table path (all excitatory-neuron, all TBI->control rescue)
-MTBC = (f"{JPG}/results/isp/garza_disease_binary_TBI_to_control/"
-        "stats_delete/by_cell_type")
+# MT: $GF_JOINTPG/results/isp/garza_disease_binary_<direction>/stats_<mode>/by_cell_type/
+#     isp_garza_disease_binary_<direction>_<mode>_excitatory_neuron_unfiltered_all_gene_ranked.tsv
+# FT: $GF_WORK/results/perturb_neurons_finetuned_<direction>/stats_<mode>/
+#     excit_finetuned[_rescue]_<mode>_unfiltered_all_gene_ranked.tsv, or the same
+#     table shipped in data/ when it is not below GF_WORK.
 ARMS = {
-    "MT_delete": (f"{MTBC}/isp_garza_disease_binary_TBI_to_control_delete_"
-                  "excitatory_neuron_unfiltered_all_gene_ranked.tsv"),
-    "MT_OE": (f"{JPG}/results/isp/garza_disease_binary_TBI_to_control/"
-              "stats_overexpress/by_cell_type/"
-              "isp_garza_disease_binary_TBI_to_control_overexpress_"
-              "excitatory_neuron_unfiltered_all_gene_ranked.tsv"),
-    "FT_delete": (f"{TBI}/results/perturb_neurons_finetuned_tbi_to_control/"
-                  "stats_delete/excit_finetuned_rescue_delete_"
-                  "unfiltered_all_gene_ranked.tsv"),
-    "FT_OE": (f"{TBI}/results/perturb_neurons_finetuned_tbi_to_control/"
-              "stats_overexpress/excit_finetuned_rescue_overexpress_"
-              "unfiltered_all_gene_ranked.tsv"),
+    "MT_delete": gf_paths.mt_stats_table("TBI_to_control", "delete"),
+    "MT_OE": gf_paths.mt_stats_table("TBI_to_control", "overexpress"),
+    "FT_delete": gf_paths.ft_stats_table("rescue_delete"),
+    "FT_OE": gf_paths.ft_stats_table("rescue_overexpress"),
     # MT off-diagonal direction (control->TBI = induction). goal=TBI, so
     # mean_shift>0 = toward TBI = a driver that INDUCES the TBI state.
-    "MT_oe_c2t": (f"{JPG}/results/isp/garza_disease_binary_control_to_TBI/"
-                  "stats_overexpress/by_cell_type/"
-                  "isp_garza_disease_binary_control_to_TBI_overexpress_"
-                  "excitatory_neuron_unfiltered_all_gene_ranked.tsv"),
-    "MT_del_c2t": (f"{JPG}/results/isp/garza_disease_binary_control_to_TBI/"
-                   "stats_delete/by_cell_type/"
-                   "isp_garza_disease_binary_control_to_TBI_delete_"
-                   "excitatory_neuron_unfiltered_all_gene_ranked.tsv"),
+    "MT_oe_c2t": gf_paths.mt_stats_table("control_to_TBI", "overexpress"),
+    "MT_del_c2t": gf_paths.mt_stats_table("control_to_TBI", "delete"),
     # FT off-diagonal direction (control->TBI = induction; goal=TBI). Note the
     # induction tables drop the "rescue" infix in the filename.
-    "FT_del_c2t": (f"{TBI}/results/perturb_neurons_finetuned_control_to_tbi/"
-                   "stats_delete/excit_finetuned_delete_"
-                   "unfiltered_all_gene_ranked.tsv"),
-    "FT_oe_c2t": (f"{TBI}/results/perturb_neurons_finetuned_control_to_tbi/"
-                  "stats_overexpress/excit_finetuned_overexpress_"
-                  "unfiltered_all_gene_ranked.tsv"),
+    "FT_del_c2t": gf_paths.ft_stats_table("induction_delete"),
+    "FT_oe_c2t": gf_paths.ft_stats_table("induction_overexpress"),
 }
 
 
@@ -125,6 +119,11 @@ def run_arm(label):
 
 
 if __name__ == "__main__":
+    if not os.path.exists(DET):
+        raise SystemExit(
+            f"ERROR: detection table not found: {DET}\n"
+            "It defines the 7,374-gene eligibility universe and is not shipped in "
+            "data/. Set GF_JOINTPG to a tree that holds it (see ../gf_paths.py).")
     os.makedirs(OUTROOT, exist_ok=True)
     todo = sys.argv[1:] if len(sys.argv) > 1 else list(ARMS)
     for label in todo:

@@ -2,8 +2,12 @@
 # Organize per-GSM 10x triplets (barcodes/features/matrix) into standard folders.
 set -euo pipefail
 
-BASE=${BASE:-/mnt/d/TBI_SC/Geneformer_TBI}
-RAW=${RAW:-/mnt/d/TBI_SC/GSE209552_RAW}
+# Section path configuration (GF_WORK, GF_GEO): see ../gf_env.sh.
+# BASE and RAW remain overridable exactly as before; only their defaults changed.
+source "$(dirname "${BASH_SOURCE[0]}")/../gf_env.sh"
+
+BASE=${BASE:-${GF_WORK}}
+RAW=${RAW:-${GF_GEO}/GSE209552_RAW}
 OUT=$BASE/10x_by_sample
 REPORT=$BASE/reports/organized_10x_files.txt
 

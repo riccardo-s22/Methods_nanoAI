@@ -3,6 +3,8 @@ import os
 for v in ("OMP_NUM_THREADS","OPENBLAS_NUM_THREADS","MKL_NUM_THREADS","NUMEXPR_NUM_THREADS"): os.environ[v]="1"
 TAG = os.environ.get("EXP2_TAG", "2h")
 import numpy as np, warnings, sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "shared"))
+from repo_paths import results_dir
 warnings.filterwarnings("ignore")
 from exp2_load import load_all, labels, EXC
 from sklearn.pipeline import make_pipeline
@@ -79,7 +81,7 @@ for k, ex in enumerate(EXC):
        (ex, cen[y==0].mean(), cen[y==1].mean(), cen[y==1].mean()-cen[y==0].mean(), mannwhitneyu(cen[y==0], cen[y==1]).pvalue))
 
 # ---- figure ----
-OUT = os.environ.get("EXP2_OUT", "/mnt/c/Users/riccardo-s/Documents/CNT/targetALS/exp5/tbi_sham_tbi_outputs")
+OUT = os.environ.get("EXP2_OUT") or results_dir("01_swcnt_blast_classification")
 os.makedirs(OUT, exist_ok=True)
 fig, ax = plt.subplots(2, 2, figsize=(12, 8))
 # (0,0) mean emission spectra at ex670 (brightest), sham vs TBI, shape-normalized

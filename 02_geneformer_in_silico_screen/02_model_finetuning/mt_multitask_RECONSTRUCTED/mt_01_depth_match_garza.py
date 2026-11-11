@@ -26,6 +26,12 @@ import numpy as np
 import pandas as pd
 import scanpy as sc
 
+# Section path configuration: see ../../gf_paths.py. The MT_RECON defaults used
+# below are a layout chosen for this repository, not the original MT project's.
+import os, sys  # noqa: E401
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+import gf_paths  # noqa: E402
+
 # UNRECORDED: the number of quantile bins is not stated in the Methods and does
 # not appear in the surviving notes. 10 deciles is the value most consistent with
 # the reported outcome (<=250-count residual median gap at 9,428 retained nuclei);
@@ -96,10 +102,11 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument(
         "--in-h5ad",
-        required=True,
+        default=gf_paths.MT_RECON["primary_h5ad"],
         help="paper-matched primary AnnData (output of apply_ngene1000_filter.py)",
     )
-    ap.add_argument("--out-h5ad", required=True, help="depth-matched AnnData to write")
+    ap.add_argument("--out-h5ad", default=gf_paths.MT_RECON["depth_matched_h5ad"],
+                    help="depth-matched AnnData to write")
     ap.add_argument("--n-bins", type=int, default=N_BINS)
     ap.add_argument("--seed", type=int, default=SEED)
     args = ap.parse_args()

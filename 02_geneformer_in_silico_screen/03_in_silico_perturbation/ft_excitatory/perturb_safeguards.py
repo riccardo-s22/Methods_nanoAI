@@ -21,7 +21,12 @@ from typing import Iterable, Iterator
 import numpy as np
 import pandas as pd
 
-GENEFORMER_PKG = Path("/work/pi_cfallini_uri_edu/Geneformer_TBI/models/Geneformer/geneformer")
+# Section path configuration (GF_GENEFORMER_PKG): see ../../gf_paths.py.
+import os, sys  # noqa: E401
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+import gf_paths  # noqa: E402
+
+GENEFORMER_PKG = Path(gf_paths.GF_GENEFORMER_PKG)
 TOKEN_DICT_PATH = GENEFORMER_PKG / "token_dictionary_gc104M.pkl"
 GENE_NAME_DICT_PATH = GENEFORMER_PKG / "gene_name_id_dict_gc104M.pkl"
 

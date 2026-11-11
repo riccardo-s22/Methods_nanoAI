@@ -8,6 +8,8 @@ os.environ.setdefault("MIX_INVERTED", "1")
 for v in ("OMP_NUM_THREADS","OPENBLAS_NUM_THREADS","MKL_NUM_THREADS"): os.environ[v]="1"
 TAG = os.environ.get("EXP2_TAG", "2h")
 import numpy as np, sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "shared"))
+from repo_paths import results_dir
 np.random.seed(0)  # legacy np.random jitter in figures
 from exp2_load import load_all, labels
 from sklearn.pipeline import make_pipeline
@@ -68,7 +70,7 @@ ax.set_xticks(xs); ax.set_xticklabels(["0\nsham","¼","½","¾","1\nTBI"])
 ax.set_title("exp2 / %s — dilution dose-response\n(classifier trained on sham & TBI only)" % TAG, fontsize=12)
 ax.legend(loc="upper left", fontsize=9)
 figA.tight_layout()
-OUT = os.environ.get("EXP2_OUT", "/mnt/c/Users/riccardo-s/Documents/CNT/targetALS/exp5/tbi_sham_tbi_outputs")
+OUT = os.environ.get("EXP2_OUT") or results_dir("01_swcnt_blast_classification")
 os.makedirs(OUT, exist_ok=True)
 pA = os.path.join(OUT, "exp2_%s_decision_dose_response.png" % TAG); figA.savefig(pA, dpi=160)
 pr("saved", pA)

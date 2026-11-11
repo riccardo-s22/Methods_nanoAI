@@ -11,7 +11,13 @@ donor effects can be judged in the donor panel).
 Panels: cell_type, condition, donor, region, n_genes (log10), pct_counts_mt.
 
 Output: results/umap/all_celltypes_expr_umap.png (+ .pdf, coords .tsv.gz)
+
+In this repository the input is $GF_WORK/h5ad/..._paperQC_nGene1000_annotated.h5ad
+(written by 01_dataset_preparation; not shipped in data/) and the output folder
+is <results>/02_geneformer_in_silico_screen/umap/. See ../gf_paths.py.
 """
+import os
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -21,9 +27,13 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-BASE = Path(__file__).resolve().parents[1]
+# Section path configuration (GF_WORK, results folder, shipped data): see ../gf_paths.py.
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import gf_paths  # noqa: E402
+
+BASE = Path(gf_paths.GF_WORK)
 H5AD = BASE / "h5ad/Garza_GSE209552_all_raw_counts_paperQC_nGene1000_annotated.h5ad"
-OUT_DIR = BASE / "results/umap"
+OUT_DIR = Path(gf_paths.GF_RESULTS) / "umap"
 PREFIX = "all_celltypes_expr"
 SEED = 0
 

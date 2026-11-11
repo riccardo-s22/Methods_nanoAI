@@ -10,19 +10,32 @@ Two questions:
  (2) Does the JointPG mechano/ECM/Polycomb signal also appear in the zero-shot
      single-CT hits? mechano-panel + ECM-Organization Fisher; consensus-PcG
      Fisher (same sets used in the three-layer analysis).
+
+Locations (see ../gf_paths.py): zero-shot tables below $GF_WORK/results/, MT
+tables below $GF_JOINTPG/results/isp/, the mechano gene list below $GF_MECHANO;
+none of them is shipped in data/. Output:
+<results>/02_geneformer_in_silico_screen/confounders/singlect_vs_jointpg_comparison.tsv
 """
+import os
 import re
+import sys
 import numpy as np
 import pandas as pd
 from scipy.stats import fisher_exact, spearmanr
 import gseapy as gp
 
+# Section path configuration (GF_WORK, results folder, shipped data): see ../gf_paths.py.
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import gf_paths  # noqa: E402
+
 FDR = 0.05
-TBI = "/work/pi_cfallini_uri_edu/Geneformer_TBI"
-JPG = ("/work/pi_cfallini_uri_edu/Geneformer_JointPG/results/isp/"
-       "garza_disease_binary_TBI_to_control/stats_delete/by_cell_type")
+TBI = gf_paths.GF_WORK
+JPG = os.path.join(gf_paths.MT_ISP, "garza_disease_binary_TBI_to_control",
+                   "stats_delete", "by_cell_type")
 JPGP = "isp_garza_disease_binary_TBI_to_control_delete"
-MECHANO = "/work/pi_cfallini_uri_edu/MechanoGEPred/data/mechano_genes_list.txt"
+MECHANO = gf_paths.MECHANO_GENES   # $GF_MECHANO/data/mechano_genes_list.txt
+OUT_TSV = os.path.join(gf_paths.gf_results_dir("confounders"),
+                       "singlect_vs_jointpg_comparison.tsv")
 
 # cell-type name maps between the two pipelines
 CTS = [("oligodendrocyte", "oligo", "oligodendrocyte"),
@@ -111,5 +124,5 @@ print("\n" + "=" * 110)
 summ = pd.DataFrame(rows)
 pd.set_option("display.width", 200, "display.max_columns", 40)
 print(summ.to_string(index=False))
-summ.to_csv(f"{TBI}/results/singlect_vs_jointpg_comparison.tsv", sep="\t", index=False)
-print("\nwrote", f"{TBI}/results/singlect_vs_jointpg_comparison.tsv")
+summ.to_csv(OUT_TSV, sep="\t", index=False)
+print("\nwrote", OUT_TSV)

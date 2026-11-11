@@ -6,7 +6,20 @@ and intercepting Figure.savefig. For every figure a script saves we write:
 Text stays as <text> (svg.fonttype='none') so it can be edited/re-sized in Illustrator,
 Inkscape or PowerPoint; font is declared as Arial.
 
-usage: python make_svg.py <script.py> <cwd> <out_subdir> [ENV=VAL ...]
+usage: python make_svg.py <script.py> [<cwd>] [<out_subdir>] [ENV=VAL ...]
+
+  <script.py>   the figure script: an absolute path, a path relative to the current directory,
+                or a path relative to the repository root
+                (e.g. 01_swcnt_blast_classification/exp2_analysis2.py)
+  <cwd>         optional, only together with <out_subdir>: directory to run the script in.
+                The scripts no longer depend on the working directory, so it can be left out.
+  <out_subdir>  optional: where the SVGs go, relative to the results tree
+                (<repo>/results, or $NANOAI_RESULTS); an absolute path is used as given.
+                Default: <section directory of the script>/svg
+  ENV=VAL       environment variables for the script (EXP2_TAG=24h, MIX_INVERTED=1, EXP3_TP=3H, ...)
+
+Because savefig is intercepted, the script's own PNG/PDF files are not written by this run;
+anything else it writes (tables, JSON, text) goes where the script normally puts it.
 """
 import os, sys, runpy, string
 import matplotlib
@@ -14,10 +27,27 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
-script, cwd, sub = sys.argv[1], sys.argv[2], sys.argv[3]
-for kv in sys.argv[4:]:
+args = sys.argv[1:]
+npos = next((i for i, a in enumerate(args) if "=" in a), len(args))   # positionals come before ENV=VAL
+pos, kvs = args[:npos], args[npos:]
+if not 1 <= len(pos) <= 3:
+    sys.exit(__doc__)
+script = pos[0]
+cwd = pos[1] if len(pos) == 3 else None
+sub = pos[-1] if len(pos) >= 2 else None
+for kv in kvs:
     k, v = kv.split("=", 1); os.environ[k] = v
-OUTDIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), sub)
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))        # after ENV=VAL, so NANOAI_* given there count
+from repo_paths import REPO_ROOT, RESULTS_DIR
+
+if not os.path.exists(script) and os.path.exists(os.path.join(REPO_ROOT, script)):
+    script = os.path.join(REPO_ROOT, script)                          # given relative to the repository root
+script = os.path.abspath(script)
+if sub is None:                                                       # default: <section>/svg under the results tree
+    rel = os.path.relpath(script, REPO_ROOT)
+    sub = os.path.join(rel.split(os.sep)[0], "svg") if os.sep in rel and not rel.startswith("..") else "svg"
+OUTDIR = sub if os.path.isabs(sub) else os.path.join(RESULTS_DIR, sub)
 os.makedirs(OUTDIR, exist_ok=True)
 
 plt.rcParams.update({"svg.fonttype": "none", "font.family": "sans-serif",
@@ -42,8 +72,8 @@ def _svg_save(fig, fname, *a, **kw):
 Figure.savefig_orig = Figure.savefig
 Figure.savefig = _svg_save
 
-script = os.path.abspath(script)
 sys.path.insert(0, os.path.dirname(script))
-os.chdir(cwd)
+if cwd is not None:
+    os.chdir(cwd)
 sys.argv = [script]
 runpy.run_path(script, run_name="__main__")

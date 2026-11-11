@@ -1,0 +1,98 @@
+section	step	class	speed	note
+01_swcnt_blast_classification	exp2_load_2h	runs locally	fast	plate layout and group sizes, 2h read
+01_swcnt_blast_classification	exp2_analysis_2h	runs locally	slow	LOO / row-out AUCs, 100-permutation null, centroid shifts, 2h (log only)
+01_swcnt_blast_classification	exp2_analysis2_2h	runs locally	slow	Supp. Fig. 1a-b: spectra, PCA, row-out permutation p, total intensity
+01_swcnt_blast_classification	exp2_classifier_compare_2h	runs locally	slow	five-classifier dilution dose-response, 2h
+01_swcnt_blast_classification	exp2_dose_pca_figs_2h	runs locally	fast	Supp. Fig. 1d: LDA decision-score dose-response and PCA of all wells, 2h
+01_swcnt_blast_classification	exp2_mixes_2h	runs locally	fast	Supp. Fig. 1c: LDA scores by group, driver emission bands
+01_swcnt_blast_classification	exp2_mix_intermediate_2h	runs locally	fast	Supp. Fig. 1c: difference-from-sham spectra, model-free projection and cosine
+01_swcnt_blast_classification	exp2_mix_features_2h	runs locally	fast	per-feature AUC vs dose monotonicity, 2h
+01_swcnt_blast_classification	exp2_load_24h	runs locally	fast	plate layout and group sizes, 24h read
+01_swcnt_blast_classification	exp2_analysis_24h	runs locally	slow	LOO / row-out AUCs, 100-permutation null, centroid shifts, 24h (log only)
+01_swcnt_blast_classification	exp2_analysis2_24h	runs locally	slow	Fig. 1a-b: spectra, PCA, row-out permutation p, total intensity
+01_swcnt_blast_classification	exp2_classifier_compare_24h	runs locally	slow	Fig. 1d: five-classifier dilution dose-response, 24h
+01_swcnt_blast_classification	exp2_dose_pca_figs_24h	runs locally	fast	LDA decision-score dose-response and PCA of all wells, 24h
+01_swcnt_blast_classification	exp2_mixes_24h	runs locally	fast	Fig. 1c: LDA scores by group, driver emission bands
+01_swcnt_blast_classification	exp2_mix_intermediate_24h	runs locally	fast	Fig. 1c: difference-from-sham spectra, model-free projection and cosine
+01_swcnt_blast_classification	exp2_mix_features_24h	runs locally	fast	per-feature AUC vs dose monotonicity, 24h
+01_swcnt_blast_classification	exp2_2h_vs_24h	runs locally	fast	2 h vs 24 h difference-spectrum comparison
+01_swcnt_blast_classification	svg_exp2_analysis2_2h	runs locally	slow	SVG panels of exp2_analysis2.py, 2h (re-runs the script)
+01_swcnt_blast_classification	svg_exp2_classifier_compare_2h	runs locally	slow	SVG panels of exp2_classifier_compare.py, 2h (re-runs the script)
+01_swcnt_blast_classification	svg_exp2_dose_pca_figs_2h	runs locally	fast	SVG panels of exp2_dose_pca_figs.py, 2h (re-runs the script)
+01_swcnt_blast_classification	svg_exp2_mixes_2h	runs locally	fast	SVG panels of exp2_mixes.py, 2h (re-runs the script)
+01_swcnt_blast_classification	svg_exp2_mix_intermediate_2h	runs locally	fast	SVG panels of exp2_mix_intermediate.py, 2h (re-runs the script)
+01_swcnt_blast_classification	svg_exp2_analysis2_24h	runs locally	slow	SVG panels of exp2_analysis2.py, 24h (re-runs the script)
+01_swcnt_blast_classification	svg_exp2_classifier_compare_24h	runs locally	slow	SVG panels of exp2_classifier_compare.py, 24h (re-runs the script)
+01_swcnt_blast_classification	svg_exp2_dose_pca_figs_24h	runs locally	fast	SVG panels of exp2_dose_pca_figs.py, 24h (re-runs the script)
+01_swcnt_blast_classification	svg_exp2_mixes_24h	runs locally	fast	SVG panels of exp2_mixes.py, 24h (re-runs the script)
+01_swcnt_blast_classification	svg_exp2_mix_intermediate_24h	runs locally	fast	SVG panels of exp2_mix_intermediate.py, 24h (re-runs the script)
+01_swcnt_blast_classification	make_supp_auc_compute	runs locally	slow	Supp. Fig. 2 numbers: 30 AUCs, ROC curves, two 1,000-permutation nulls
+01_swcnt_blast_classification	make_supp_auc_figure	runs locally	fast	Supp. Fig. 2 drawing
+01_swcnt_blast_classification	exp2_chirality_classify	needs unshipped input	fast	Supp. Fig. 3; needs exp2_{2h,24h}_peakfeats.npz (EXP2_PEAKFEATS_DIR)
+01_swcnt_blast_classification	make_suppfig4_dilution_readouts	runs locally	fast	Supp. Fig. 4, shape-vector version
+01_swcnt_blast_classification	make_suppfig4_gaussian_readouts	needs unshipped input	fast	Supp. Fig. 4, Gaussian-feature version; needs exp2_24h_peakfeats.npz (EXP2_PEAKFEATS_DIR)
+01_swcnt_blast_classification	exp2_pca_quant	runs locally	fast	PCA variance, PC1 AUC, PERMANOVA (B = 9,999), dispersion test
+01_swcnt_blast_classification	check_simple_descriptors	runs locally	fast	univariate descriptor AUCs
+01_swcnt_blast_classification	check_permutation_power	runs locally	fast	power analysis of the permutation tests
+01_swcnt_blast_classification	exp2_chirality_classify_truelog	needs unshipped input	slow	true-log-ratio rerun of Supp. Fig. 3; needs exp2_{2h,24h}_peakfeats.npz
+01_swcnt_blast_classification	make_suppfig4_gaussian_readouts_truelog	needs unshipped input	fast	true-log Gaussian Supp. Fig. 4; needs exp2_24h_peakfeats.npz
+02_geneformer_in_silico_screen	upstream_00_to_03	needs cluster	-	runner placeholder for the cluster half listed in the next rows; print it with run_section.sh --print-cluster-plan
+02_geneformer_in_silico_screen	upstream:00_environment	needs cluster	-	conda environment, Geneformer install, model weights (Slurm, network)
+02_geneformer_in_silico_screen	upstream:01_dataset_preparation	needs cluster	-	GEO GSE209552 download, QC, annotation, tokenization (CPU, more than 8 GB RAM, network)
+02_geneformer_in_silico_screen	upstream:02_model_finetuning/ft_excitatory	needs cluster	-	FT classifier fine-tuning, evaluation, state embeddings (1 GPU)
+02_geneformer_in_silico_screen	upstream:03_in_silico_perturbation/ft_excitatory	needs cluster	-	218 GPU array tasks, about 865 GPU-hours, then stage 05 aggregation of the chunk pickles
+02_geneformer_in_silico_screen	upstream:mt_multitask_RECONSTRUCTED	needs unshipped input	-	six reconstructed MT scripts; MT checkpoint and tokenized MT corpus do not exist; not used for published results
+02_geneformer_in_silico_screen	seed_ft_stats	runs locally	fast	copies the 8 shipped FT per-gene tables into the work tree layout
+02_geneformer_in_silico_screen	07_biological_candidate_filter_rescue_delete	runs locally	fast	stage 07 candidate tables, rescue_delete
+02_geneformer_in_silico_screen	07_biological_candidate_filter_rescue_overexpress	runs locally	fast	stage 07 candidate tables, rescue_overexpress
+02_geneformer_in_silico_screen	07_biological_candidate_filter_induction_delete	runs locally	fast	stage 07 candidate tables, induction_delete
+02_geneformer_in_silico_screen	07_biological_candidate_filter_induction_overexpress	runs locally	fast	stage 07 candidate tables, induction_overexpress
+02_geneformer_in_silico_screen	09_pathway_enrichment_rescue_delete	runs locally	fast	stage 09 Enrichr tables, rescue_delete; needs internet (skipped by --offline)
+02_geneformer_in_silico_screen	09_pathway_enrichment_rescue_overexpress	runs locally	fast	stage 09 Enrichr tables, rescue_overexpress; needs internet (skipped by --offline)
+02_geneformer_in_silico_screen	09_pathway_enrichment_induction_delete	runs locally	fast	stage 09 Enrichr tables, induction_delete; needs internet (skipped by --offline)
+02_geneformer_in_silico_screen	09_pathway_enrichment_induction_overexpress	runs locally	fast	stage 09 Enrichr tables, induction_overexpress; needs internet (skipped by --offline)
+02_geneformer_in_silico_screen	build_detection_table	needs unshipped input	fast	rebuilds the 20%-detection table (7,374-gene universe); needs the stage-01 excitatory AnnData (--with-project-tree)
+02_geneformer_in_silico_screen	excit_pathway_heatmap_enrich	needs unshipped input	fast	pathway-driver lists and Enrichr tables behind Supp. Fig. 6; needs the detection table (--with-project-tree); MT arms need MT tables that do not exist
+02_geneformer_in_silico_screen	excit_pathway_heatmap_FT	runs locally	fast	Supp. Fig. 6a heatmap; default run reads the shipped matrix
+02_geneformer_in_silico_screen	excit_pathway_heatmap_MT	runs locally	fast	Supp. Fig. 6b heatmap; reads the shipped matrix
+02_geneformer_in_silico_screen	excit_drug_repurpose_FT_union	needs unshipped input	fast	FT drug-signature enrichment, union; needs the detection table (--with-project-tree), internet
+02_geneformer_in_silico_screen	excit_drug_repurpose_FT_core	needs unshipped input	fast	FT drug-signature enrichment, core; needs the detection table (--with-project-tree), internet
+02_geneformer_in_silico_screen	excit_drug_repurpose_MT_union	needs unshipped input	fast	MT drug-signature enrichment, union; MT per-gene tables do not exist
+02_geneformer_in_silico_screen	excit_drug_repurpose_MT_core	needs unshipped input	fast	MT drug-signature enrichment, core; MT per-gene tables do not exist
+02_geneformer_in_silico_screen	excit_drug_crossmodel	runs locally	fast	cross-model consensus table (source of Fig. 2b)
+02_geneformer_in_silico_screen	excit_drug_repurpose_figure	runs locally	fast	three-panel drug-repurposing figure
+02_geneformer_in_silico_screen	confound_check_sex_age_drivers	needs unshipped input	fast	sex / age confounder screen; needs the stage-01 excitatory AnnData and the driver lists (--with-project-tree)
+02_geneformer_in_silico_screen	cross_direction_network_analysis	runs locally	fast	cross-direction overlap and STRING network; needs internet (skipped by --offline)
+02_geneformer_in_silico_screen	compare_singlect_vs_jointpg	needs unshipped input	fast	needs zero-shot and MT per-cell-type tables, which no script in the repository writes
+02_geneformer_in_silico_screen	mt_cls_umap_RECONSTRUCTED	needs unshipped input	-	Fig. 2a; MT checkpoint does not exist; the script is a reconstruction (never run by the runner)
+02_geneformer_in_silico_screen	umap_all_celltypes_expression	needs unshipped input	fast	Supp. Fig. 5a; needs the stage-01 15,172-nucleus AnnData (--with-project-tree)
+02_geneformer_in_silico_screen	umap_excit_ft	needs unshipped input	fast	Supp. Fig. 5b; needs the FT embedding cache, or a GPU and the FT checkpoint (--with-project-tree)
+02_geneformer_in_silico_screen	make_suppfig5_model_metrics	runs locally	fast	Supp. Fig. 5 metric panels (numbers are constants in the script)
+02_geneformer_in_silico_screen	make_fig2_panelB	runs locally	fast	Fig. 2b
+02_geneformer_in_silico_screen	heatmap_excit_finetuned_cosine_shifts	needs unshipped input	fast	per-cell cosine-shift heatmap; needs the raw perturbation chunk pickles and the detection table (--with-project-tree)
+03_protein_corona_proteomics	preflight	runs locally	fast	input, packages and reachability of UniProt, g:Profiler, Enrichr
+03_protein_corona_proteomics	ms_analysis	runs locally	fast	Fig. 3: enrichment, PCA, volcano, workbook, summary.json; needs internet
+04_drug_response_prediction	exp3_perm_power	runs locally	slow	Supp. Fig. 7: 20,000-permutation nulls, shape and chirality features
+04_drug_response_prediction	exp3_perm_power__svg	runs locally	slow	Supp. Fig. 7 SVG panels (re-runs the script)
+04_drug_response_prediction	exp3_load	needs unshipped input	fast	loader self-check; needs the 6 h read (EXP3_DIR)
+04_drug_response_prediction	exp3_peakfit	needs refit environment	-	refit of the 12 peaks from raw spectra; crashes with NumPy >= 2.4 (no numpy.trapz); runs with PYTHON set to the envs/refit.yml interpreter
+04_drug_response_prediction	exp3_peakfit_ratios	needs refit environment	-	refit plus 66 ratios; same requirement as exp3_peakfit
+04_drug_response_prediction	exp3_build_cache	needs unshipped input	-	rebuild of the peak-feature caches; needs the 6 h read (EXP3_DIR) and the refit environment
+04_drug_response_prediction	exp3_export_peakfeats	runs locally	fast	peak-feature table (compared with data/ by check_results.py)
+04_drug_response_prediction	exp3_analysis	needs unshipped input	-	shape-based discrimination at 3 h and 6 h; needs the 6 h read (EXP3_DIR)
+04_drug_response_prediction	exp3_drug_axis	runs locally	fast	Fig. 4b, Supp. Fig. 8 and all drug-axis statistics
+04_drug_response_prediction	exp3_drug_axis__svg	runs locally	fast	Fig. 4b / Supp. Fig. 8 SVG panels
+04_drug_response_prediction	exp3_drug_effects	runs locally	fast	2x3 factorial, DiD, within-plate PERMANOVA, TOST (not a panel)
+04_drug_response_prediction	exp3_3H_organoid_score	runs locally	fast	Fig. 4g per-well scores (compared with data/ by check_results.py)
+04_drug_response_prediction	plot_wb_swcnt_corr	needs unshipped input	fast	Supp. Fig. 10b-c; needs corr_wb_swcnt.xlsx (EXP3_WB_XLSX)
+04_drug_response_prediction	exp3_3H_pressure	runs locally	fast	plate-gradient and outlier robustness check
+04_drug_response_prediction	exp3_drug_swap	runs locally	fast	label-swap check
+04_drug_response_prediction	exp3_perm_power_truelog	runs locally	slow	true-log 20,000-permutation nulls
+04_drug_response_prediction	exp3_perm_power_truelog__svg	runs locally	slow	true-log Supp. Fig. 7 SVG panels (re-runs the script)
+04_drug_response_prediction	exp3_3H_organoid_score_truelog	runs locally	fast	true-log per-well scores (compared with data/ by check_results.py)
+04_drug_response_prediction	exp3_drug_axis_truelog	runs locally	fast	true-log drug-axis statistics
+04_drug_response_prediction	exp3_drug_axis_truelog__svg	runs locally	fast	true-log drug-axis SVG panels
+04_drug_response_prediction	exp3_peakfit_ratios_truelog	runs locally	fast	true-log 12-fraction / 66-ratio / 78-feature AUCs (about 5 min)
+04_drug_response_prediction	exp3_peakfit_ratios_truelog__FLO1e-6	runs locally	fast	control run with the published floor; prints the per-ratio Cohen's d (about 5 min)
+04_drug_response_prediction	plot_wb_swcnt_corr_truelog	needs unshipped input	fast	true-log WB correlation; needs corr_wb_swcnt.xlsx (EXP3_WB_XLSX)
+04_drug_response_prediction	verify_outputs	runs locally	fast	section-level comparison of tables and printed statistics with the published values

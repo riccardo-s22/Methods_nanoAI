@@ -55,6 +55,12 @@ from pathlib import Path
 
 import pandas as pd
 
+# Section path configuration: see ../../gf_paths.py. The MT_RECON defaults used
+# below are a layout chosen for this repository, not the original MT project's.
+import os, sys  # noqa: E401
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+import gf_paths  # noqa: E402
+
 # perturb_safeguards.py and biological_gene_classes.py survive in the FT folder.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "ft_excitatory"))
 
@@ -137,16 +143,22 @@ def aggregate_one_population(
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--arm", required=True, choices=sorted(ARM_STATES))
-    ap.add_argument("--chunks-dir", required=True, help="raw ISP pickles for this arm")
+    ap.add_argument("--chunks-dir", default=None,
+                    help="raw ISP pickles for this arm (default: MT_RECON isp_chunks/<arm>)")
     ap.add_argument(
         "--tokenized-heldout",
-        required=True,
+        default=gf_paths.MT_RECON["tokenized_test"],
         help="tokenized held-out-donor .dataset that was perturbed",
     )
-    ap.add_argument("--out-dir", required=True)
+    ap.add_argument("--out-dir", default=None, help="default: MT_RECON isp_stats/<arm>")
     ap.add_argument("--cells-per-chunk", type=int, default=56)
     ap.add_argument("--skip-isp-stats", action="store_true")
     args = ap.parse_args()
+    # Location defaults that depend on --arm (mt_05 writes its chunks to <output-directory>/<arm>).
+    if args.chunks_dir is None:
+        args.chunks_dir = os.path.join(gf_paths.MT_RECON["isp_chunks"], args.arm)
+    if args.out_dir is None:
+        args.out_dir = os.path.join(gf_paths.MT_RECON["isp_stats"], args.arm)
 
     from datasets import load_from_disk
 

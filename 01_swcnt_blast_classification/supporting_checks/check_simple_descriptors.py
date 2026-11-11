@@ -4,7 +4,10 @@ total intensity. Then the dilution trend on the same axes."""
 import os, sys
 for v in ("OMP_NUM_THREADS","OPENBLAS_NUM_THREADS","MKL_NUM_THREADS","NUMEXPR_NUM_THREADS"): os.environ[v]="1"
 os.environ.setdefault("MIX_INVERTED","1")
-sys.path.insert(0,"/mnt/c/Users/riccardo-s/Documents/CNT/TBI/exp2")
+_HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(_HERE, ".."))                    # exp2_load.py
+sys.path.insert(0, os.path.join(_HERE, "..", "..", "shared"))
+from repo_paths import data_path
 import numpy as np, warnings; warnings.filterwarnings("ignore")
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
@@ -12,8 +15,8 @@ from sklearn.metrics import roc_auc_score
 from scipy import stats
 
 FRAC={"sham":0.0,"mix25":0.25,"mix50":0.5,"mix75":0.75,"TBI":1.0}
-for TAG,D in [("2h","/mnt/c/Users/riccardo-s/Documents/CNT/TBI/exp2/2h"),
-              ("24h","/mnt/c/Users/riccardo-s/Documents/CNT/TBI/exp2/24h")]:
+for TAG,D in [("2h",data_path("01_swcnt_blast_classification","spectra","2h")),
+              ("24h",data_path("01_swcnt_blast_classification","spectra","24h"))]:
     os.environ["EXP2_DIR"]=D
     for m in [k for k in list(sys.modules) if k.startswith("exp2_load")]: del sys.modules[m]
     from exp2_load import load_all, labels, EXC

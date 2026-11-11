@@ -24,7 +24,12 @@ condition==start_state so chunk indexing assumes start-only cells.
 """
 from pathlib import Path
 
-BASE = Path("/work/pi_cfallini_uri_edu/Geneformer_TBI")
+# Section path configuration (GF_WORK, GF_MODEL_DIR, ...): see ../../gf_paths.py.
+import os, sys  # noqa: E401
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+import gf_paths  # noqa: E402
+
+BASE = Path(gf_paths.GF_WORK)
 
 CELLTYPE_CONFIG: dict[str, dict] = {
     # ----- Excitatory neurons, control → TBI direction (INDUCER screen) -----

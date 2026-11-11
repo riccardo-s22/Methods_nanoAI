@@ -11,6 +11,10 @@ import os, sys, warnings, importlib.util
 from itertools import combinations
 for v in ("OMP_NUM_THREADS","OPENBLAS_NUM_THREADS","MKL_NUM_THREADS"): os.environ[v]="1"
 warnings.filterwarnings("ignore")
+_HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(_HERE, ".."))                    # section top level: exp3_load.py
+sys.path.insert(0, os.path.join(_HERE, "..", "..", "shared"))
+from repo_paths import data_path, results_dir, env_path
 import numpy as np
 import exp3_load as L
 from scipy.stats import mannwhitneyu
@@ -21,9 +25,10 @@ from sklearn.model_selection import LeaveOneOut
 from sklearn.metrics import roc_auc_score
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 def pr(*a): print(*a); sys.stdout.flush()
-OUT="/mnt/c/Users/riccardo-s/Documents/CNT/TBI/paper/svg/truelog_rerun"
+OUT=env_path("EXP3_OUT", "") or results_dir("04_drug_response_prediction", "sensitivity_true_log_ratios"); os.makedirs(OUT, exist_ok=True)
+CACHE_DIR=env_path("EXP3_CACHE_DIR", data_path("04_drug_response_prediction", "chirality_features"))  # shipped cache, read-only
 
-PD="/mnt/c/Users/riccardo-s/Documents/CNT/targetALS/exp5/physical_descriptors"
+PD=os.path.join(_HERE,"..","vendored")
 spec=importlib.util.spec_from_file_location("cie",os.path.join(PD,"chirality_interpolated_extraction.py"))
 cie=importlib.util.module_from_spec(spec); spec.loader.exec_module(cie)
 CHIR=cie.CHIRALITY_POSITIONS; ORDER=list(CHIR.keys())
@@ -57,7 +62,7 @@ GRP={"sham":(cs,Gs["sham"]),"tbi":(ct,Gt["tbi"]),"resv_tbi":(ct,Gt["resv_tbi"]),
      "mg132_sham":(cs,Gs["mg132_sham"]),"swcnt_noncm":(cs,Gs["swcnt_noncm"])}
 # TRUELOG RERUN: peaks are taken from the cached canonical fits used by every reported exp3 analysis
 # (refitting from raw fails in this environment: curve_fit "initial guess outside bounds").
-_z=np.load("/mnt/c/Users/riccardo-s/Documents/CNT/targetALS/exp5/exp3_3H_peakfeats.npz")
+_z=np.load(os.path.join(CACHE_DIR,"exp3_3H_peakfeats.npz"))
 MX={g:_z["MX_"+g] for g in GRP}; AU={g:_z["AU_"+g] for g in GRP}
 
 flo=float(os.environ.get("FLO","0.0"))  # TRUELOG RERUN (was 1e-6)

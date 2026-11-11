@@ -17,9 +17,16 @@ Three views of the relationship:
      and connected-component clustering
 
 Outputs land under
-  /work/pi_cfallini_uri_edu/Geneformer_TBI/results/cross_direction_network_v2/
+  <results>/02_geneformer_in_silico_screen/cross_direction_network_v2/
+(originally <project root>/results/cross_direction_network_v2/). Inputs are read
+below $GF_WORK/results/ (see ../gf_paths.py): the candidate tables written by
+07_biological_candidate_filter_finetuned.py, the all-gene tables, and the
+enrichment_<mode>/ folders written by 09_pathway_enrichment_finetuned.py. From a
+fresh clone, `python gf_paths.py --seed-ft-stats` followed by stages 07 and 09
+puts them there. Needs internet access (STRING).
 """
 import json
+import os
 import sys
 import time
 from collections import Counter, defaultdict
@@ -29,8 +36,12 @@ import pandas as pd
 import requests
 from scipy.stats import hypergeom
 
-BASE = Path("/work/pi_cfallini_uri_edu/Geneformer_TBI/results")
-OUT  = BASE / "cross_direction_network_v2"
+# Section path configuration (GF_WORK, results folder, shipped data): see ../gf_paths.py.
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import gf_paths  # noqa: E402
+
+BASE = Path(gf_paths.GF_WORK) / "results"
+OUT  = Path(gf_paths.gf_results_dir("cross_direction_network_v2"))
 OUT.mkdir(parents=True, exist_ok=True)
 
 DATASETS = {
@@ -273,7 +284,10 @@ print(f"  Union top-{TOP_N} across all {len(DATASETS)} datasets: {len(union_top)
 # STRING API — POST identifiers in chunks (STRING limit is 2000 ids per call).
 STRING_URL = "https://string-db.org/api/json/network"
 session = requests.Session()
-session.headers.update({"caller_identity": "geneformer_tbi_riccardo-s_uri_edu"})
+# STRING asks API clients to identify themselves; the original run sent a personal
+# identifier here. Set STRING_CALLER_IDENTITY to use your own.
+session.headers.update({"caller_identity": os.environ.get(
+    "STRING_CALLER_IDENTITY", "geneformer_tbi_in_silico_screen")})
 
 print(f"  Querying STRING ({STRING_URL}) ...")
 chunk = 1500

@@ -40,6 +40,12 @@ from pathlib import Path
 
 from geneformer import InSilicoPerturber
 
+# Section path configuration: see ../../gf_paths.py. The MT_RECON defaults used
+# below are a layout chosen for this repository, not the original MT project's.
+import os, sys  # noqa: E401
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+import gf_paths  # noqa: E402
+
 STATE_KEY = "disease_binary"
 EMB_LAYER = -1
 FORWARD_BATCH_SIZE = 30
@@ -121,20 +127,20 @@ def main() -> None:
     ap.add_argument("--arm", required=True, choices=sorted(ARMS))
     ap.add_argument(
         "--model-directory",
-        required=True,
+        default=gf_paths.GF_MT_MODEL,
         help="retained MT checkpoint (published: .../ksplit1/checkpoint-600)",
     )
     ap.add_argument(
         "--input-data-file",
-        required=True,
+        default=gf_paths.MT_RECON["tokenized_test"],
         help="tokenized HELD-OUT-DONOR .dataset (the perturbed nuclei)",
     )
     ap.add_argument(
         "--state-embs",
-        required=True,
+        default=gf_paths.MT_RECON["state_embs"],
         help="pickled centroids written by mt_04_build_state_embs.py",
     )
-    ap.add_argument("--output-directory", required=True)
+    ap.add_argument("--output-directory", default=gf_paths.MT_RECON["isp_chunks"])
     ap.add_argument(
         "--chunk-index",
         type=int,

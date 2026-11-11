@@ -5,7 +5,12 @@ import numpy as np
 import scanpy as sc
 from scipy import sparse
 
-BASE = Path("/mnt/d/TBI_SC/Geneformer_TBI")
+# Section path configuration (GF_WORK, GF_GEO, ...): see ../gf_paths.py.
+import os, sys  # noqa: E401
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import gf_paths  # noqa: E402
+
+BASE = Path(gf_paths.GF_WORK)
 FILES = sorted(list((BASE / "h5ad").glob("*.h5ad")) + list((BASE / "h5ad/celltype_subsets").glob("*.h5ad")))
 
 for f in FILES:

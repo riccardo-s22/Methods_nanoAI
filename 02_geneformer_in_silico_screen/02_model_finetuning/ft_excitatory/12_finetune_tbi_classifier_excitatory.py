@@ -33,12 +33,17 @@ os.environ.setdefault("WANDB_DISABLED", "true")
 
 from geneformer import Classifier
 
-BASE = Path("/work/pi_cfallini_uri_edu/Geneformer_TBI")
+# Section path configuration (GF_WORK, GF_MODEL_DIR, ...): see ../../gf_paths.py.
+import os, sys  # noqa: E401
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+import gf_paths  # noqa: E402
+
+BASE = Path(gf_paths.GF_WORK)
 TOKENIZED = BASE / "tokenized_paperQC_nGene1000/excitatory_neuron/GSE209552_excitatory_neurons_nGene1000.dataset"
-MODEL_ROOT = BASE / "models/Geneformer/Geneformer-V2-104M"
+MODEL_ROOT = Path(gf_paths.GF_PRETRAINED)
 
 PREP_OUT_DIR  = BASE / "results/finetune_tbi_excitatory"
-FT_PARENT_DIR = BASE / "models/Geneformer/fine_tuned_models_tbi"
+FT_PARENT_DIR = Path(gf_paths.GF_FT_MODELS)
 HELDOUT_EVAL_DIR = PREP_OUT_DIR / "heldout_eval"
 
 OUTPUT_PREFIX_PREP   = "excit_tbi_clf"

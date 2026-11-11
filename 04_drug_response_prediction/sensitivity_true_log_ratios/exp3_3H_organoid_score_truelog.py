@@ -15,12 +15,17 @@ import os, sys, warnings
 from itertools import combinations
 for v in ("OMP_NUM_THREADS","OPENBLAS_NUM_THREADS","MKL_NUM_THREADS"): os.environ[v]="1"
 warnings.filterwarnings("ignore")
+_HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(_HERE, ".."))                    # section top level: exp3_load.py
+sys.path.insert(0, os.path.join(_HERE, "..", "..", "shared"))
+from repo_paths import data_path, results_dir, env_path
 import numpy as np, pandas as pd
 import exp3_load as L
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.preprocessing import StandardScaler
-OUT="/mnt/c/Users/riccardo-s/Documents/CNT/TBI/paper/svg/truelog_rerun"
-CACHE="/mnt/c/Users/riccardo-s/Documents/CNT/targetALS/exp5/exp3_3H_peakfeats.npz"  # corrected labels
+OUT=env_path("EXP3_OUT", "") or results_dir("04_drug_response_prediction", "sensitivity_true_log_ratios"); os.makedirs(OUT, exist_ok=True)
+CACHE_DIR=env_path("EXP3_CACHE_DIR", data_path("04_drug_response_prediction", "chirality_features"))  # shipped cache, read-only
+CACHE=os.path.join(CACHE_DIR,"exp3_3H_peakfeats.npz")  # corrected labels
 PAIRS=list(combinations(range(12),2)); flo=0.0  # TRUELOG RERUN (was 1e-6)
 z=np.load(CACHE)
 def ratio(g):

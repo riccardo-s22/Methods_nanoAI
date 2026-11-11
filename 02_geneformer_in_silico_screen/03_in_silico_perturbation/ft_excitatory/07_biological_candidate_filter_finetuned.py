@@ -47,6 +47,9 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+# finetuned_celltype_config.py sits in 02_model_finetuning/ft_excitatory in this
+# repository (the scripts were written for one flat scripts/ folder).
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "02_model_finetuning" / "ft_excitatory"))
 from biological_gene_classes import (
     ARTIFACT_LITERALS,
     HEMOGLOBINS,

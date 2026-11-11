@@ -11,6 +11,8 @@ os.environ.setdefault("MIX_INVERTED", "1")  # col10=1/4 TBI, col12=3/4 TBI
 for v in ("OMP_NUM_THREADS","OPENBLAS_NUM_THREADS","MKL_NUM_THREADS"): os.environ[v]="1"
 TAG = os.environ.get("EXP2_TAG", "2h")
 import numpy as np, sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "shared"))
+from repo_paths import results_dir
 from exp2_load import load_all, labels, EXC
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 def pr(*a): print(*a); sys.stdout.flush()
@@ -80,7 +82,7 @@ ax[1].axhline(proj["negctrl"].mean(), c="#7f8c8d", ls="--", label="negctrl")
 ax[1].set_xlabel("TBI-media fraction"); ax[1].set_ylabel("un-whitened sham→TBI projection")
 ax[1].set_title("Intermediate phenotype check"); ax[1].legend(fontsize=8)
 fig.tight_layout()
-OUT = os.environ.get("EXP2_OUT", "/mnt/c/Users/riccardo-s/Documents/CNT/targetALS/exp5/tbi_sham_tbi_outputs")
+OUT = os.environ.get("EXP2_OUT") or results_dir("01_swcnt_blast_classification")
 os.makedirs(OUT, exist_ok=True)
 p = os.path.join(OUT, "exp2_%s_mix_intermediate.png" % TAG); fig.savefig(p, dpi=150)
 pr("\nsaved", p)

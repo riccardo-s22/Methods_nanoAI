@@ -11,6 +11,10 @@ import os, sys, warnings
 from itertools import combinations
 for v in ("OMP_NUM_THREADS","OPENBLAS_NUM_THREADS","MKL_NUM_THREADS"): os.environ[v]="1"
 warnings.filterwarnings("ignore")
+_HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(_HERE, ".."))                    # section top level: exp3_load.py
+sys.path.insert(0, os.path.join(_HERE, "..", "..", "shared"))
+from repo_paths import data_path, env_path
 import numpy as np
 from scipy import stats
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
@@ -18,7 +22,8 @@ from sklearn.preprocessing import StandardScaler
 def pr(*a): print(*a); sys.stdout.flush()
 ORDER=["ch8_3","ch6_5","ch7_5","ch10_2","ch9_4","ch8_4","ch7_6","ch8_6","ch8_7","ch9_5","ch10_3","ch10_5"]
 PAIRS=list(combinations(range(12),2)); flo=1e-6
-z=np.load("exp3_3H_peakfeats.npz")
+CACHE_DIR=env_path("EXP3_CACHE_DIR", data_path("04_drug_response_prediction", "chirality_features"))  # shipped cache, read-only
+z=np.load(os.path.join(CACHE_DIR,"exp3_3H_peakfeats.npz"))
 def ratio(g):
     M=z[f"MX_{g}"]; return np.column_stack([np.log10((M[:,a]+flo)/(M[:,b]+flo)) for a,b in PAIRS])
 base={g:ratio(g) for g in ["sham","tbi","resv_tbi","mg132_tbi","resv_sham","mg132_sham"]}

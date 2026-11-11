@@ -23,7 +23,12 @@ import scanpy as sc
 from scipy import sparse
 from scipy.stats import median_abs_deviation
 
-BASE = Path("/mnt/d/TBI_SC/Geneformer_TBI")
+# Section path configuration (GF_WORK, GF_GEO, ...): see ../gf_paths.py.
+import os, sys  # noqa: E401
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import gf_paths  # noqa: E402
+
+BASE = Path(gf_paths.GF_WORK)
 SRC = BASE / "h5ad/Garza_GSE209552_all_raw_counts_geneformer_ready.h5ad"   # full merged
 ANN = BASE / "h5ad/Garza_GSE209552_all_raw_counts_paperQC_annotated.h5ad"  # has cell_type
 OUT = BASE / "h5ad/Garza_GSE209552_all_raw_counts_paperQC_nGene1000_annotated.h5ad"
@@ -130,7 +135,7 @@ for fname, labels in SUBSET_MAP.items():
 # ---------------------------------------------------------------------
 # Excitatory-neuron gene coverage and Geneformer V2 vocab overlap.
 import pickle
-V2_PKL = Path("/home/riccardo-s/miniconda3/envs/geneformer/lib/python3.10/site-packages/geneformer/token_dictionary_gc104M.pkl")
+V2_PKL = Path(gf_paths.TOKEN_DICT)
 exc = final[final.obs["cell_type"] == "excitatory_neuron"]
 exc_present = np.asarray((exc.X > 0).sum(axis=0)).ravel()
 exc_detected_ens = final.var["ensembl_id"].astype(str).values[exc_present >= 1]

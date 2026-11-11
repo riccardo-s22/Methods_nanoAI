@@ -4,9 +4,14 @@ import re
 from pathlib import Path
 import pandas as pd
 
-BASE = Path("/mnt/d/TBI_SC/Geneformer_TBI")
-SOFT = Path("/mnt/d/TBI_SC/GSE209552_family.soft/GSE209552_family.soft")
-SRA = Path("/mnt/d/TBI_SC/SraRunTable (1).csv")
+# Section path configuration (GF_WORK, GF_GEO, ...): see ../gf_paths.py.
+import os, sys  # noqa: E401
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import gf_paths  # noqa: E402
+
+BASE = Path(gf_paths.GF_WORK)
+SOFT = Path(gf_paths.GF_SOFT)
+SRA = Path(gf_paths.GF_SRA_RUN_TABLE)
 OUT = BASE / "metadata/gse209552_sample_metadata_curated.tsv"
 
 SUFFIX_TO_REGION = {"F": "frontal", "T": "temporal", "LT": "temporal_L", "RT": "temporal_R",

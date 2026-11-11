@@ -17,45 +17,46 @@ INTERSECTION (induction AND rescue agree) are the highest-confidence targets and
 are reported separately.
 
 Model = FT (excit-specific fine-tuned). Background = genes det>=20% in excit.
+
+Locations (see ../gf_paths.py): the detection table and the MT ranked tables are
+read below $GF_JOINTPG, the FT ranked tables below $GF_WORK (or, if absent there,
+from data/02_geneformer_in_silico_screen/in_silico_perturbation/), and the output
+goes to <results>/02_geneformer_in_silico_screen/drug_repurpose/<model>/. The
+detection table is not shipped, so this script cannot run from a fresh clone.
 """
 import os
 import sys
 import pandas as pd
 import gseapy as gp
 
-TBI = "/work/pi_cfallini_uri_edu/Geneformer_TBI"
-JPG = "/work/pi_cfallini_uri_edu/Geneformer_JointPG"
-ENR = f"{TBI}/results/pathway_heatmap/enrich"
-DET = (f"{JPG}/results/isp/garza_disease_binary_TBI_to_control/"
-       "mechano_analysis/layer3/garza_qc4_de_by_celltype.tsv")
+# Section path configuration (GF_WORK, results folder, shipped data): see ../gf_paths.py.
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import gf_paths  # noqa: E402
+
+TBI = gf_paths.GF_WORK
+JPG = gf_paths.GF_JOINTPG
+ENR = gf_paths.analysis_input("pathway_heatmap", "enrich")
+DET = gf_paths.MT_DETECTION_TABLE   # $GF_JOINTPG/results/isp/garza_disease_binary_TBI_to_control/mechano_analysis/layer3/garza_qc4_de_by_celltype.tsv
 CT, THRESH, FDR = "excitatory_neuron", 0.20, 0.05
 N_CELLS_MIN = 50      # min perturbed cells per gene
 SHIFT_PCT = 0.75      # keep shift > this per-arm quantile of the significant set
-OUT = f"{TBI}/results/drug_repurpose"
+OUT = os.path.join(gf_paths.GF_RESULTS, "drug_repurpose")
 
 # raw ranked-table paths per arm label (same sources as excit_pathway_heatmap_enrich.py)
-MTBC = (f"{JPG}/results/isp/garza_disease_binary_TBI_to_control/"
-        "stats_delete/by_cell_type")
+# MT: $GF_JOINTPG/results/isp/garza_disease_binary_<direction>/stats_<mode>/by_cell_type/
+#     isp_garza_disease_binary_<direction>_<mode>_excitatory_neuron_unfiltered_all_gene_ranked.tsv
+# FT: $GF_WORK/results/perturb_neurons_finetuned_<direction>/stats_<mode>/
+#     excit_finetuned[_rescue]_<mode>_unfiltered_all_gene_ranked.tsv, or the same
+#     table shipped in data/ when it is not below GF_WORK.
 RANKED = {
-    "MT_delete": (f"{MTBC}/isp_garza_disease_binary_TBI_to_control_delete_"
-                  "excitatory_neuron_unfiltered_all_gene_ranked.tsv"),
-    "MT_OE": (f"{JPG}/results/isp/garza_disease_binary_TBI_to_control/"
-              "stats_overexpress/by_cell_type/isp_garza_disease_binary_TBI_to_"
-              "control_overexpress_excitatory_neuron_unfiltered_all_gene_ranked.tsv"),
-    "MT_oe_c2t": (f"{JPG}/results/isp/garza_disease_binary_control_to_TBI/"
-                  "stats_overexpress/by_cell_type/isp_garza_disease_binary_control_"
-                  "to_TBI_overexpress_excitatory_neuron_unfiltered_all_gene_ranked.tsv"),
-    "MT_del_c2t": (f"{JPG}/results/isp/garza_disease_binary_control_to_TBI/"
-                   "stats_delete/by_cell_type/isp_garza_disease_binary_control_to_"
-                   "TBI_delete_excitatory_neuron_unfiltered_all_gene_ranked.tsv"),
-    "FT_delete": (f"{TBI}/results/perturb_neurons_finetuned_tbi_to_control/"
-                  "stats_delete/excit_finetuned_rescue_delete_unfiltered_all_gene_ranked.tsv"),
-    "FT_OE": (f"{TBI}/results/perturb_neurons_finetuned_tbi_to_control/"
-              "stats_overexpress/excit_finetuned_rescue_overexpress_unfiltered_all_gene_ranked.tsv"),
-    "FT_del_c2t": (f"{TBI}/results/perturb_neurons_finetuned_control_to_tbi/"
-                   "stats_delete/excit_finetuned_delete_unfiltered_all_gene_ranked.tsv"),
-    "FT_oe_c2t": (f"{TBI}/results/perturb_neurons_finetuned_control_to_tbi/"
-                  "stats_overexpress/excit_finetuned_overexpress_unfiltered_all_gene_ranked.tsv"),
+    "MT_delete": gf_paths.mt_stats_table("TBI_to_control", "delete"),
+    "MT_OE": gf_paths.mt_stats_table("TBI_to_control", "overexpress"),
+    "MT_oe_c2t": gf_paths.mt_stats_table("control_to_TBI", "overexpress"),
+    "MT_del_c2t": gf_paths.mt_stats_table("control_to_TBI", "delete"),
+    "FT_delete": gf_paths.ft_stats_table("rescue_delete"),
+    "FT_OE": gf_paths.ft_stats_table("rescue_overexpress"),
+    "FT_del_c2t": gf_paths.ft_stats_table("induction_delete"),
+    "FT_oe_c2t": gf_paths.ft_stats_table("induction_overexpress"),
 }
 _DET_CACHE = None
 
@@ -140,6 +141,11 @@ def drug_name(term):
 
 
 if __name__ == "__main__":
+    if not os.path.exists(DET):
+        raise SystemExit(
+            f"ERROR: detection table not found: {DET}\n"
+            "It defines the 7,374-gene eligibility universe and is not shipped in "
+            "data/. Set GF_JOINTPG to a tree that holds it (see ../gf_paths.py).")
     os.makedirs(f"{OUT}/{MODEL}", exist_ok=True)
     print(f"===== model {MODEL} =====")
     s = {k: hits(v) for k, v in A.items()}

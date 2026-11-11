@@ -12,7 +12,7 @@ DATA PROVENANCE -- every number below is transcribed from a logged evaluation,
 nothing is recomputed from a model and nothing is traced off a figure.
 
   FT (fine-tuned excitatory-neuron TBI-vs-control classifier)
-      D:\\Unity\\Geneformer_TBI\\logs\\finetune_eval_57711262.out   (job 57711262,
+      <project root>/logs/finetune_eval_57711262.out   (job 57711262,
       uri-gpu012, 15 May 2026) section "=== HELD-OUT TEST METRICS ===".
       Design is a donor-level outer split, from finetune_tbi_excit_57711067.out:
           HELD-OUT TEST donors : 502, 6, 19
@@ -24,16 +24,16 @@ nothing is recomputed from a model and nothing is traced off a figure.
 
   MT (Garza multi-task model, "MT v1 depth-matched", checkpoint-600)
       The primary eval log is GONE: the project tree
-      /work/pi_cfallini_uri_edu/Geneformer_Garza/ no longer exists on Unity, the
+      <cluster work area>/Geneformer_Garza/ no longer exists on Unity, the
       /snapshots/work backups reach back only to 2026-11-05 (already after the
       deletion), and Slurm accounting confirms only that the eval job ran --
           sacct -j 59383803 -> garza_mt_eval  COMPLETED  2026-05-28T13:47:51
-                               WorkDir /work/pi_cfallini_uri_edu/Geneformer_Garza/scripts
+                               WorkDir <cluster work area>/Geneformer_Garza/scripts
       The model checkpoint is deleted with it, so the evaluation cannot be re-run.
 
       The values below are the ones that survive, in two independent Claude-Code
-      project-memory records written at the time, on Unity under
-      ~/.claude/projects/-work-pi-cfallini-uri-edu-Geneformer-TBI/memory/ :
+      project-memory records written at the time, on Unity (the coding
+      assistant's project-memory folder for the Geneformer_TBI project):
           project_geneformer_garza_mt_v1.md
             "disease_binary 0.732 - per-class recall control 0.970, TBI 0.621"
             "cell_type 0.992", "region 0.439", mean macro-F1 0.721
@@ -90,15 +90,22 @@ WHAT IS DERIVED, AND HOW (marked with a dagger in the table)
 TO COMPLETE THE FIGURE: if the MT eval output is recovered, fill accuracy / roc_auc /
 cm for MT below and re-run; panels that have data are drawn identically either way.
 Recomputing the derivation: scratchpad mt_derive.py.
+
+Output folder in this repository: <results>/02_geneformer_in_silico_screen/figures/
+(originally next to this script). The script reads no input file.
 """
 import os
+import sys
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-STEM = os.path.join(HERE, "suppfig5_metrics")
+# Section path configuration (GF_WORK, results folder, shipped data): see ../gf_paths.py.
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import gf_paths  # noqa: E402
+
+STEM = os.path.join(gf_paths.gf_results_dir("figures"), "suppfig5_metrics")
 
 # ----------------------------------------------------------------- the numbers
 # cm      : rows = true class, cols = predicted class, in CLASSES order (counts).

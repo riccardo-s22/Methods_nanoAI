@@ -39,9 +39,14 @@ the described content, not a pixel reproduction.
 
 Original file name: not recorded.
 =============================================================================
+The three location arguments default to the section configuration
+(../gf_paths.py: GF_MT_MODEL and MT_RECON). Those default locations are a layout
+chosen for this repository, not the layout of the original MT project.
 """
 
 import argparse
+import os
+import sys
 from pathlib import Path
 
 import matplotlib
@@ -49,6 +54,10 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
+
+# Section path configuration: see ../gf_paths.py.
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import gf_paths  # noqa: E402
 
 EMB_LAYER = -1  # second-to-last layer
 FORWARD_BATCH_SIZE = 32
@@ -132,15 +141,15 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument(
         "--model-directory",
-        required=True,
+        default=gf_paths.GF_MT_MODEL,
         help="retained MT checkpoint (published: .../ksplit1/checkpoint-600)",
     )
     ap.add_argument(
         "--input-data-file",
-        required=True,
+        default=gf_paths.MT_RECON["tokenized_all"],
         help="tokenized depth-matched MT corpus (all 9,428 nuclei)",
     )
-    ap.add_argument("--out-dir", required=True)
+    ap.add_argument("--out-dir", default=gf_paths.MT_RECON["umap"])
     ap.add_argument("--nproc", type=int, default=8)
     args = ap.parse_args()
 

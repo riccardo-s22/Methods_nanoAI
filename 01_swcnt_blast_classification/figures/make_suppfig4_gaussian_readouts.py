@@ -2,18 +2,22 @@
 computed on the split-Gaussian chirality features instead of the shape-normalized spectra.
 
 Features: 66 pairwise log10 ratios of the fitted split-Gaussian maxima (MX) of the 12 chiralities
-(exactly as in paper/svg/exp2_chirality/exp2_chirality_classify.py: sham/blast MX from the cached
-targetALS/exp5/exp2_24h_peakfeats.npz, dilution + negative-control MX from exp2_24h_mix_peakfeats.npz,
-MIX_INVERTED=1 labelling).
+(exactly as in exp2_chirality_classify.py: sham/blast MX from the cached exp2_24h_peakfeats.npz,
+dilution + negative-control MX from exp2_24h_mix_peakfeats.npz, MIX_INVERTED=1 labelling).
+Both caches are read from data/01_swcnt_blast_classification/chirality_features/; the folder holding
+exp2_24h_peakfeats.npz can be overridden with EXP2_PEAKFEATS_DIR.
   a  classifier score: StandardScaler -> PCA(15) -> LDA fitted on sham + blast (the chirality model),
      rescaled sham mean = 0, blast mean = 1
   b  projection onto d = mu_blast - mu_sham in the raw 66-ratio space (no standardization, no PCA)
   c  schematic
   d  cosine between each group's mean change from sham and d, same 66 features
 Run:  python make_suppfig4_gaussian_readouts.py [out_basename]
+(default out_basename: results/01_swcnt_blast_classification/supp_fig4_dilution/suppfig4_gaussian_readouts)
 """
 import os, sys
 for v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS"): os.environ[v] = "1"
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "shared"))
+from repo_paths import data_path, results_dir, env_path
 from itertools import combinations
 import numpy as np
 from sklearn.preprocessing import StandardScaler
@@ -28,8 +32,11 @@ plt.rcParams.update({"svg.fonttype": "none", "font.family": "sans-serif",
                      "axes.spines.top": False, "axes.spines.right": False})
 
 # ------------------------------------------------------------------ data (Gaussian-fit chirality features)
-CACHE = "/mnt/c/Users/riccardo-s/Documents/CNT/targetALS/exp5/exp2_24h_peakfeats.npz"
-MIXC = "/mnt/c/Users/riccardo-s/Documents/CNT/TBI/paper/svg/exp2_chirality/exp2_24h_mix_peakfeats.npz"
+_CHIR = data_path("01_swcnt_blast_classification", "chirality_features")
+CACHE = os.path.join(env_path("EXP2_PEAKFEATS_DIR", _CHIR), "exp2_24h_peakfeats.npz")
+MIXC = os.path.join(_CHIR, "exp2_24h_mix_peakfeats.npz")
+if not os.path.exists(MIXC):                       # not shipped: use the copy exp2_chirality_classify.py builds
+    MIXC = os.path.join(results_dir("01_swcnt_blast_classification", "supp_fig3_chirality"), "exp2_24h_mix_peakfeats.npz")
 PAIRS = list(combinations(range(12), 2))
 # FEAT=paper  : log10((MXa + 1e-6) / (MXb + 1e-6)), exactly as in exp2_chirality_classify.py. NOTE: the fitted
 #               maxima are ~1e-14..1e-12, so the 1e-6 floor dominates and these features are, to r = 1.0000,
@@ -136,7 +143,7 @@ if cmin >= 0: axD.set_xticks([0, 0.25, 0.5, 0.75, 1])
 axD.set_xlabel("Direction match with blast\n(cos θ of the group-mean change from sham)")
 axD.set_title("d   Direction of change versus blast", loc="left", fontsize=9, fontweight="bold", pad=8)
 
-out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(os.path.abspath(__file__)), "suppfig4_gaussian_readouts" + ("" if FEAT == "paper" else "_truelog"))
+out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(results_dir("01_swcnt_blast_classification", "supp_fig4_dilution"), "suppfig4_gaussian_readouts" + ("" if FEAT == "paper" else "_truelog"))
 fig.savefig(out + ".svg"); fig.savefig(out + ".png", dpi=300)
 from PIL import Image
 Image.open(out + ".png").convert("RGB").save(out + ".tif", dpi=(300, 300), compression="tiff_lzw")

@@ -65,6 +65,12 @@ from pathlib import Path
 import pandas as pd
 from geneformer import MTLClassifier
 
+# Section path configuration: see ../../gf_paths.py. The MT_RECON defaults used
+# below are a layout chosen for this repository, not the original MT project's.
+import os, sys  # noqa: E401
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+import gf_paths  # noqa: E402
+
 # UNRECORDED - see caveat 1 above.
 SEED = 42
 
@@ -171,16 +177,18 @@ def select_checkpoint(heldout_eval_dir: Path) -> pd.DataFrame:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--train-path", required=True, help="tokenized train .dataset")
-    ap.add_argument("--val-path", required=True, help="tokenized validation .dataset")
+    ap.add_argument("--train-path", default=gf_paths.MT_RECON["tokenized_train"],
+                    help="tokenized train .dataset")
+    ap.add_argument("--val-path", default=gf_paths.MT_RECON["tokenized_valid"],
+                    help="tokenized validation .dataset")
     ap.add_argument(
         "--test-path",
-        required=True,
+        default=gf_paths.MT_RECON["tokenized_test"],
         help="tokenized held-out-donor .dataset (also used for checkpoint selection)",
     )
-    ap.add_argument("--pretrained-path", required=True, help="Geneformer-V2-104M")
-    ap.add_argument("--model-save-path", required=True)
-    ap.add_argument("--results-dir", required=True)
+    ap.add_argument("--pretrained-path", default=gf_paths.GF_PRETRAINED, help="Geneformer-V2-104M")
+    ap.add_argument("--model-save-path", default=gf_paths.MT_RECON["model_save"])
+    ap.add_argument("--results-dir", default=gf_paths.MT_RECON["finetune_results"])
     ap.add_argument(
         "--select-only",
         action="store_true",

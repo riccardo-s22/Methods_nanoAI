@@ -4,7 +4,7 @@ abundance (blast vs control) and enrichment analysis.
 
 Control: C4R, C5R, C9    Blast: A1, A2, C6R  (C4, C5 excluded: separate batch)
 """
-import os, json, time
+import os, sys, json, time
 import numpy as np, pandas as pd
 import requests
 from scipy import stats, special
@@ -15,8 +15,10 @@ import matplotlib.pyplot as plt
 from adjustText import adjust_text
 
 BASE = os.path.dirname(os.path.abspath(__file__))
-RAW = os.path.join(BASE, "..", "Riccado_Report.csv")
-OUT = BASE
+sys.path.insert(0, os.path.join(BASE, "..", "shared"))
+from repo_paths import data_path, results_dir
+RAW = data_path("03_protein_corona_proteomics", "Riccado_Report.csv")
+OUT = results_dir("03_protein_corona_proteomics")
 FIG = os.path.join(OUT, "figures"); os.makedirs(FIG, exist_ok=True)
 
 CTRL = ["C4R", "C5R", "C9"]

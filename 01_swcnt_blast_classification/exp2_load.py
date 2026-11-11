@@ -9,11 +9,16 @@ NEW interleaved layout (exp2):
   cols2-9: even(2,4,6,8)=sham, odd(3,5,7,9)=TBI
   col10 = 3/4 TBI + 1/4 sham ; col11 = 1/2+1/2 ; col12 = 1/4 TBI + 3/4 sham
 """
-import numpy as np, glob, os
+import numpy as np, glob, os, sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "shared"))
+from repo_paths import data_path, env_path
 
 # directory selectable via env EXP2_DIR (default 2h timepoint);
 # loader is filename-agnostic (globs *.txt, parses excitation after "__").
-DIR = os.environ.get("EXP2_DIR", "/mnt/c/Users/riccardo-s/Documents/CNT/TBI/exp2/2h")
+# Default: <repo>/data/01_swcnt_blast_classification/spectra/2h, whatever EXP2_TAG says.
+# EXP2_TAG only labels titles and output file names: for the 24 h read set BOTH
+# EXP2_TAG=24h and EXP2_DIR=<repo>/data/01_swcnt_blast_classification/spectra/24h.
+DIR = env_path("EXP2_DIR", data_path("01_swcnt_blast_classification", "spectra", "2h"))
 EXC = [570, 640, 670, 750, 780]
 ROWS = "ABCDEFGH"
 

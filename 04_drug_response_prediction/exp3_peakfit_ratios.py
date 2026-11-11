@@ -11,6 +11,8 @@ import os, sys, warnings, importlib.util
 from itertools import combinations
 for v in ("OMP_NUM_THREADS","OPENBLAS_NUM_THREADS","MKL_NUM_THREADS"): os.environ[v]="1"
 warnings.filterwarnings("ignore")
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "shared"))
+from repo_paths import data_path, results_dir, env_path
 import numpy as np
 import exp3_load as L
 from scipy.stats import mannwhitneyu
@@ -21,9 +23,9 @@ from sklearn.model_selection import LeaveOneOut
 from sklearn.metrics import roc_auc_score
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 def pr(*a): print(*a); sys.stdout.flush()
-OUT="/mnt/c/Users/riccardo-s/Documents/CNT/TBI/exp3"
+OUT=env_path("EXP3_OUT", "") or results_dir("04_drug_response_prediction"); os.makedirs(OUT, exist_ok=True)
 
-PD="/mnt/c/Users/riccardo-s/Documents/CNT/targetALS/exp5/physical_descriptors"
+PD=os.path.join(os.path.dirname(os.path.abspath(__file__)),"vendored")
 spec=importlib.util.spec_from_file_location("cie",os.path.join(PD,"chirality_interpolated_extraction.py"))
 cie=importlib.util.module_from_spec(spec); spec.loader.exec_module(cie)
 CHIR=cie.CHIRALITY_POSITIONS; ORDER=list(CHIR.keys())

@@ -17,8 +17,15 @@ os.environ.setdefault("WANDB_DISABLED", "true")
 
 from geneformer import Classifier
 
-BASE = Path("/work/pi_cfallini_uri_edu/Geneformer_TBI")
-TRAINED_MODEL = BASE / "models/Geneformer/fine_tuned_models_tbi/260515_geneformer_cellClassifier_excit_tbi_clf/ksplit1/checkpoint-306"
+# Section path configuration (GF_WORK, GF_MODEL_DIR, ...): see ../../gf_paths.py.
+import os, sys  # noqa: E401
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+import gf_paths  # noqa: E402
+
+BASE = Path(gf_paths.GF_WORK)
+# The published run's checkpoint (datestamped 260515 by Geneformer). A rerun of
+# 12_finetune_* gets a new datestamp: point GF_FT_MODEL at its ksplit1/checkpoint-<N>.
+TRAINED_MODEL = Path(gf_paths.GF_FT_MODEL or gf_paths.FT_PUBLISHED_CHECKPOINT)
 ID_CLASS_DICT = BASE / "results/finetune_tbi_excitatory/excit_tbi_clf_id_class_dict.pkl"
 TEST_DATASET  = BASE / "results/finetune_tbi_excitatory/excit_tbi_clf_labeled_test.dataset"
 HELDOUT_DIR   = BASE / "results/finetune_tbi_excitatory/heldout_eval"

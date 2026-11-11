@@ -19,6 +19,11 @@ import os, sys, warnings, importlib.util
 from itertools import combinations
 for v in ("OMP_NUM_THREADS","OPENBLAS_NUM_THREADS","MKL_NUM_THREADS"): os.environ[v]="1"
 warnings.filterwarnings("ignore")
+_HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(_HERE, ".."))                    # section top level: exp3_load.py
+sys.path.insert(0, os.path.join(_HERE, "..", "..", "shared"))
+sys.path.insert(0, os.path.join(_HERE, "..", "vendored"))        # exp3_7d_load.py (outlier_keep)
+from repo_paths import env_path, RESULTS_DIR
 import numpy as np
 if not hasattr(np,"trapz"): np.trapz=np.trapezoid
 import exp3_load as L
@@ -29,7 +34,7 @@ from sklearn.decomposition import PCA
 from sklearn.model_selection import LeaveOneOut
 from sklearn.metrics import roc_auc_score
 def pr(*a): print(*a); sys.stdout.flush()
-OUT="/mnt/c/Users/riccardo-s/Documents/CNT/TBI/exp3"
+OUT=env_path("EXP3_OUT", "") or os.path.join(RESULTS_DIR,"04_drug_response_prediction")  # unused: this script only prints
 
 cs,em=L.load_plate("SHAM","3H"); Gs=L.groups("SHAM")
 ct,_ =L.load_plate("TBI","3H");  Gt=L.groups("TBI")
@@ -116,7 +121,7 @@ pr("    |col-grad predicted offset (TBI  slope)| / |observed sham->TBI diff| = %
    %(np.linalg.norm(pred_t)/np.linalg.norm(vdiff),cos(pred_t,vdiff)))
 
 # ---- [E] Gaussian-ratio AUC with outliers removed ----
-PD="/mnt/c/Users/riccardo-s/Documents/CNT/targetALS/exp5/physical_descriptors"
+PD=os.path.join(_HERE,"..","vendored")
 spec=importlib.util.spec_from_file_location("cie",os.path.join(PD,"chirality_interpolated_extraction.py"))
 cie=importlib.util.module_from_spec(spec); spec.loader.exec_module(cie)
 CHIR=cie.CHIRALITY_POSITIONS; EXCa=np.array(L.EXC,float); PAIRS=list(combinations(range(12),2))

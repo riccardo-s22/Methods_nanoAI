@@ -1,0 +1,31 @@
+# Optional environment for the three section 04 scripts that refit the chirality peaks from the
+# raw spectra: exp3_peakfit.py, exp3_peakfit_ratios.py, exp3_build_cache.py.
+#
+# Why it exists: under the paper's stated stack (envs/spectral.yml, NumPy 2.5.1) these scripts
+# crash, because the fit-failure fallback of the peak extractor calls numpy.trapz, which NumPy
+# removed. Every published number comes from the shipped cache
+# data/04_drug_response_prediction/chirality_features/exp3_3H_peakfeats.npz instead, so this
+# environment is needed only to regenerate that cache.
+#
+#     mamba env create -f envs/refit.yml
+#     PYTHON="$(conda info --base)/envs/nanoai-refit/bin/python" bash 04_drug_response_prediction/run_section.sh --skip-slow
+#
+# Status of the pins: these are the versions of an existing local environment (Python 3.10.20)
+# in which the unmodified scripts regenerated the shipped 3 h cache bit for bit (4,560 of 4,560
+# values) and printed the published 0.613 / 0.938 / 0.920. That run is what verifies the pins;
+# an environment created from this file was not tested. exp3_build_cache.py also needs the
+# 6 h read, which is not in the repository (EXP3_DIR).
+name: nanoai-refit
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+      - numpy==2.2.6
+      - scipy==1.15.3
+      - scikit-learn==1.7.2
+      - pandas==2.3.3
+      - matplotlib==3.10.9
+      - openpyxl==3.1.5
+      - joblib==1.5.3

@@ -39,7 +39,9 @@ n = 32 sham + 32 blast per read. One organoid = one well = one experimental unit
 Cached split-Gaussian fits of the 12 canonical (n,m) species and the permutation
 nulls behind Supplementary Figure 3:
 
-- `exp2_{2h,24h}_mix_peakfeats.npz` — per-well peak features
+- `exp2_{2h,24h}_mix_peakfeats.npz` — peak features of the dilution and
+  negative-control wells only (8 + 8 + 8 + 7 wells × 12 species). The fits of the
+  sham and blast wells (`exp2_{2h,24h}_peakfeats.npz`) are not shipped.
 - `exp2_{2h,24h}_permnull.npz` — leave-one-out LDA AUC null, 5,000 label permutations
 
 ---
@@ -98,7 +100,8 @@ tables below.
 ### pathway_enrichment/
 
 Source matrices for Supplementary Figure 6: `excit_pathway_enrichment_matrix_FT.tsv`
-and `..._MT.tsv`, holding −log10 FDR-corrected p per term per arm. Enrichr
+and `..._MT.tsv`, holding FDR-corrected p per term per arm (the heatmap scripts
+take −log10 when drawing). Enrichr
 (GSEApy), one-sided Fisher exact, FDR-corrected within each library, against GO
 Biological Process 2026, KEGG 2026, Reactome 2024 and MSigDB Hallmark 2020, with
 the 7,374-gene excitatory background.
@@ -124,6 +127,15 @@ core (bold in the figure).
 > compound names that the library's name parser split — not compounds. They were
 > discarded. The six real consensus drugs are resveratrol, diclofenac,
 > vemurafenib, dexamethasone, morphine and methamphetamine.
+
+> The row counts of the two `drug_candidates_ranked_union.tsv` tables, **45** (FT)
+> and **21** (MT), are parsed names **before** the exclusion list is applied
+> (column `artifact`). Nine FT and four MT names are on the exclusion list. The MT
+> table also holds `ljp005` and `ljp006`: these are not compounds but the batch
+> identifiers of the two LINCS L1000 signatures that reached FDR-corrected
+> significance in the MT model (adjusted p = 0.010), which the name parser took
+> as names. No LINCS L1000 signature was significant in the FT model. None of
+> these rows is a consensus drug.
 
 ---
 
@@ -187,9 +199,12 @@ The layout above is the corrected one, confirmed against lab records. Use
 ### chirality_features/
 
 - `exp3_3H_peakfeats.npz` — **the authoritative cached split-Gaussian fits.** The
-  pipeline reads this rather than refitting: refitting from the raw spectra fails
-  under the installed SciPy, so this cache, not the `.txt` files, is the
-  effective feature source for this section.
+  pipeline reads this rather than refitting, so this cache, not the `.txt`
+  files, is the effective feature source for this section. The fits were made
+  with Python 3.10.20, NumPy 2.2.6 and SciPy 1.15.3, and that stack
+  (`../envs/refit.yml`) regenerates the cache bit for bit. Under the Python 3.13
+  stack used for the rest of the spectral analyses the refit scripts stop,
+  because `numpy.trapz` no longer exists in NumPy 2.5.
 - `exp3_3H_chirality_peak_features.csv` — the same features as a flat table,
   one row per well: group, plate row and column, 12 `gauss_max`, 12 `gauss_auc`,
   12 area fractions and the 66 pairwise log10 intensity ratios.

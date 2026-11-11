@@ -9,12 +9,16 @@ space; cosine between each group's mean change from sham and d). Only the presen
   d  direction match (cosine) of each group's mean spectral change with d
 Writes <out>.svg (editable text), <out>.png and <out>.tif (300 dpi).
 Run:  python make_suppfig4_dilution_readouts.py [out_basename]
+(default out_basename: results/01_swcnt_blast_classification/supp_fig4_dilution/suppfig4_dilution_readouts)
 """
 import os, sys
-os.environ.setdefault("EXP2_DIR", "/mnt/c/Users/riccardo-s/Documents/CNT/TBI/exp2/24h")
+_HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(_HERE, ".."))                    # exp2_load.py
+sys.path.insert(0, os.path.join(_HERE, "..", "..", "shared"))
+from repo_paths import data_path, results_dir
+os.environ.setdefault("EXP2_DIR", data_path("01_swcnt_blast_classification", "spectra", "24h"))
 os.environ.setdefault("MIX_INVERTED", "1")
 for v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS"): os.environ[v] = "1"
-sys.path.insert(0, "/mnt/c/Users/riccardo-s/Documents/CNT/TBI/exp2")
 import numpy as np
 from exp2_load import load_all, labels
 from sklearn.preprocessing import StandardScaler
@@ -126,7 +130,7 @@ axD.set_ylim(len(gD) - 0.4, -0.6); axD.set_xlim(-0.1, 1.15); axD.set_xticks([0, 
 axD.set_xlabel("Direction match with the blast spectrum\n(cos θ of the group-mean change from sham)")
 axD.set_title("d   Direction of change versus blast", loc="left", fontsize=9, fontweight="bold", pad=8)
 
-out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(os.path.abspath(__file__)), "suppfig4_dilution_readouts")
+out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(results_dir("01_swcnt_blast_classification", "supp_fig4_dilution"), "suppfig4_dilution_readouts")
 fig.savefig(out + ".svg"); fig.savefig(out + ".png", dpi=300)
 from PIL import Image
 Image.open(out + ".png").convert("RGB").save(out + ".tif", dpi=(300, 300), compression="tiff_lzw")

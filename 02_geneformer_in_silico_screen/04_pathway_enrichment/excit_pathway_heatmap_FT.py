@@ -16,15 +16,23 @@ same average-shift hit definition as the MT/FT figures
 (excit_pathway_heatmap_enrich.py): FDR-sig, det>=20%, shift>significant-set avg.
 """
 import os
+import sys
 import numpy as np
 import pandas as pd
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-TBI = "/work/pi_cfallini_uri_edu/Geneformer_TBI"
-ENR = f"{TBI}/results/pathway_heatmap/enrich"
-OUT = f"{TBI}/results/pathway_heatmap/excit_pathway_enrichment_heatmap_FT.png"
+# Section path configuration (GF_WORK, results folder, shipped data): see ../gf_paths.py.
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import gf_paths  # noqa: E402
+
+# Per-arm Enrichr tables written by excit_pathway_heatmap_enrich.py: a rerun below
+# <results>/02_geneformer_in_silico_screen/pathway_heatmap/enrich, else the original
+# project tree $GF_WORK/results/pathway_heatmap/enrich. An arm found in neither is
+# read from the shipped source matrix of this figure (see load()).
+OUTDIR = gf_paths.gf_results_dir("pathway_heatmap")
+OUT = os.path.join(OUTDIR, "excit_pathway_enrichment_heatmap_FT.png")
 TOP_PER_ARM = 15
 
 ARMS = [
@@ -42,8 +50,17 @@ SIG = 0.05
 
 
 def load(label):
-    p = f"{ENR}/{label}/{label}_enrichr_allterms.csv"
+    p = gf_paths.analysis_input("pathway_heatmap", "enrich", label,
+                                f"{label}_enrichr_allterms.csv")
     if not os.path.exists(p):
+        # No per-arm Enrichr table: take the arm's adjusted P-values from the
+        # shipped matrix (data/.../pathway_enrichment/), which this script wrote
+        # from those tables in the published run.
+        shipped = gf_paths.shipped_pathway_arm(label)
+        if shipped is not None:
+            print(f"[{label}] no per-arm Enrichr table; using the shipped matrix "
+                  f"{os.path.basename(gf_paths.SHIPPED_PATHWAY_MATRIX[label.split('_', 1)[0]])}")
+            return shipped.rename(columns={"Adjusted P-value": label})
         print(f"[{label}] allterms MISSING ({p})")
         return None
     df = pd.read_csv(p)[["Gene_set", "Term", "Adjusted P-value"]]
@@ -128,6 +145,6 @@ print("wrote", OUT)
 # full (uncapped) matrix dump
 full = pd.concat([load(k).set_index(["Gene_set", "Term"]) for k in ready], axis=1)
 full.reset_index().to_csv(
-    f"{TBI}/results/pathway_heatmap/excit_pathway_enrichment_matrix_FT.tsv",
+    os.path.join(OUTDIR, "excit_pathway_enrichment_matrix_FT.tsv"),
     sep="\t", index=False)
 print("wrote full matrix tsv")

@@ -14,6 +14,8 @@ same-plate arms as predicted, that is biology not batch; (c) directional cosine 
 import os, sys, warnings
 for v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS"): os.environ[v] = "1"
 warnings.filterwarnings("ignore")
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "shared"))
+from repo_paths import data_path, results_dir, env_path
 import numpy as np
 import exp3_load as L
 from scipy.stats import spearmanr
@@ -25,7 +27,7 @@ from sklearn.metrics import roc_auc_score
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 def pr(*a): print(*a); sys.stdout.flush()
 
-OUT = "/mnt/c/Users/riccardo-s/Documents/CNT/TBI/exp3"
+OUT = env_path("EXP3_OUT", "") or results_dir("04_drug_response_prediction"); os.makedirs(OUT, exist_ok=True)
 EXC = L.EXC
 COL = {"sham":"#2e86c1","tbi":"#cb4335","resv_tbi":"#27ae60","mg132_tbi":"#8e44ad",
        "resv_sham":"#a9cce3","mg132_sham":"#d2b4de","swcnt_noncm":"#7f8c8d"}

@@ -6,6 +6,8 @@ os.environ.setdefault("MIX_INVERTED", "1")  # col10=1/4 TBI, col12=3/4 TBI
 for v in ("OMP_NUM_THREADS","OPENBLAS_NUM_THREADS","MKL_NUM_THREADS"): os.environ[v]="1"
 TAG = os.environ.get("EXP2_TAG", "2h")
 import numpy as np, sys, warnings; warnings.filterwarnings("ignore")
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "shared"))
+from repo_paths import results_dir
 from exp2_load import load_all, labels, EXC
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
@@ -87,7 +89,7 @@ ax[1].axhline(0, c="grey", ls="--"); ax[1].set_xlim(900, 1450)
 ax[1].set_xlabel("emission (nm)"); ax[1].set_ylabel("TBI - sham (shape)")
 ax[1].set_title("Driver shape-difference spectrum"); ax[1].legend(fontsize=7)
 fig.tight_layout()
-OUT = os.environ.get("EXP2_OUT", "/mnt/c/Users/riccardo-s/Documents/CNT/targetALS/exp5/tbi_sham_tbi_outputs")
+OUT = os.environ.get("EXP2_OUT") or results_dir("01_swcnt_blast_classification")
 os.makedirs(OUT, exist_ok=True)
 p = os.path.join(OUT, "exp2_%s_dose_drivers.png" % TAG); fig.savefig(p, dpi=150)
 pr("\nsaved", p)

@@ -14,6 +14,10 @@ import os, sys, warnings, importlib.util
 from itertools import combinations
 for v in ("OMP_NUM_THREADS","OPENBLAS_NUM_THREADS","MKL_NUM_THREADS"): os.environ[v]="1"
 warnings.filterwarnings("ignore")
+_HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(_HERE, ".."))                    # section top level: exp3_load.py
+sys.path.insert(0, os.path.join(_HERE, "..", "..", "shared"))
+from repo_paths import data_path, results_dir, env_path
 import numpy as np
 import exp3_load as L
 from scipy import stats
@@ -24,7 +28,8 @@ from sklearn.decomposition import PCA
 from sklearn.model_selection import LeaveOneOut
 from sklearn.metrics import roc_auc_score
 def pr(*a): print(*a); sys.stdout.flush()
-OUT="/mnt/c/Users/riccardo-s/Documents/CNT/TBI/paper/svg/truelog_rerun"
+OUT=env_path("EXP3_OUT", "") or results_dir("04_drug_response_prediction", "sensitivity_true_log_ratios"); os.makedirs(OUT, exist_ok=True)
+CACHE_DIR=env_path("EXP3_CACHE_DIR", data_path("04_drug_response_prediction", "chirality_features"))  # shipped cache, read-only
 B0=20000
 ORDER=["ch8_3","ch6_5","ch7_5","ch10_2","ch9_4","ch8_4","ch7_6","ch8_6","ch8_7","ch9_5","ch10_3","ch10_5"]
 PAIRS=list(combinations(range(12),2)); flo=0.0  # TRUELOG RERUN (was 1e-6)
@@ -36,7 +41,7 @@ def shp(cube,idx):
     X=cube[idx].astype(float); X=X/X.sum(1,keepdims=True); return X.reshape(len(idx),-1)  # 2560
 XA=np.vstack([shp(cs,Gs["sham"]),shp(ct,Gt["tbi"])])
 # ---------- Method B: ratios (from cache) ----------
-z=np.load("exp3_3H_peakfeats.npz")
+z=np.load(os.path.join(CACHE_DIR,"exp3_3H_peakfeats.npz"))
 def ratios(MX): return np.column_stack([np.log10((MX[:,a]+flo)/(MX[:,b]+flo)) for a,b in PAIRS])
 XB=np.vstack([ratios(z["MX_sham"]),ratios(z["MX_tbi"])])
 y=np.r_[np.zeros((Gs["sham"]).shape[0] if False else 32),np.ones(32)]  # 32 sham, 32 TBI

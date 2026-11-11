@@ -10,12 +10,21 @@ be the dominant organizing direction here, unlike the MT model where cell_type
 dominates).
 
 Output: results/umap/excit_ft_umap.png  (+ per-cell embeddings parquet)
+
+In this repository (see ../gf_paths.py) the tokenized dataset and the fine-tuned
+checkpoint are read below $GF_WORK (the checkpoint through GF_FT_MODEL or the
+pointer file) and everything is written to
+<results>/02_geneformer_in_silico_screen/umap/. Extracting the embeddings needs
+a GPU and the checkpoint. If the per-cell embedding cache excit_ft_cellembs.parquet
+already exists, in that output folder or in $GF_WORK/results/umap/, it is read
+and only the UMAP and the plot are computed, which needs neither.
 """
 import multiprocessing
 if __name__ == "__main__":
     multiprocessing.set_start_method("fork", force=True)
 
 import os
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -24,12 +33,19 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-BASE = Path("/work/pi_cfallini_uri_edu/Geneformer_TBI")
+# Section path configuration (GF_WORK, results folder, shipped data): see ../gf_paths.py.
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import gf_paths  # noqa: E402
+
+BASE = Path(gf_paths.GF_WORK)
 TOKENIZED = BASE / "tokenized_paperQC_nGene1000/excitatory_neuron/GSE209552_excitatory_neurons_nGene1000.dataset"
 POINTER = BASE / "results/finetune_tbi_excitatory/trained_model_path.txt"
-OUT_DIR = BASE / "results/umap"
+OUT_DIR = Path(gf_paths.GF_RESULTS) / "umap"
 PREFIX = "excit_ft_cellembs"
-EMB_CACHE = OUT_DIR / f"{PREFIX}.parquet"
+# The cache is written to OUT_DIR; an existing one is also accepted from the
+# original project tree ($GF_WORK/results/umap/), which is only read.
+EMB_CACHE_OUT = OUT_DIR / f"{PREFIX}.parquet"
+EMB_CACHE = Path(gf_paths.analysis_input("umap", f"{PREFIX}.parquet"))
 PNG = OUT_DIR / "excit_ft_umap.png"
 LABELS = ["condition", "donor", "region", "sample"]
 FORWARD_BATCH = 32
@@ -39,7 +55,9 @@ def get_embs():
     if EMB_CACHE.exists():
         print(f"[skip extract] loading cached {EMB_CACHE}")
         return pd.read_parquet(EMB_CACHE)
-    MODEL_DIR = Path(POINTER.read_text().strip())
+    # GF_FT_MODEL if set, else the path stored in the pointer file (re-based onto
+    # GF_WORK when the stored cluster path does not exist on this machine).
+    MODEL_DIR = Path(gf_paths.resolve_model_pointer(str(POINTER)))
     assert MODEL_DIR.exists(), f"missing model {MODEL_DIR}"
     from geneformer import EmbExtractor
     print(f"extracting CLS embeddings from {MODEL_DIR}")
@@ -60,8 +78,8 @@ def get_embs():
         output_directory=str(OUT_DIR),
         output_prefix=PREFIX,
     )
-    df.to_parquet(EMB_CACHE)
-    print(f"cached embeddings -> {EMB_CACHE}  shape={df.shape}")
+    df.to_parquet(EMB_CACHE_OUT)
+    print(f"cached embeddings -> {EMB_CACHE_OUT}  shape={df.shape}")
     return df
 
 

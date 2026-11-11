@@ -1,0 +1,83 @@
+# Conda environment for section 02, the Geneformer pipeline (dataset preparation, fine-tuning,
+# in-silico perturbation, and the --with-project-tree steps of its runner).
+# NOT needed for `bash reproduce.sh`: the CPU half of section 02 that runs from data/ uses
+# envs/spectral.yml.
+#
+#     mamba env create -f envs/geneformer.yml
+#     export GF_CONDA_ENV="$(conda info --base)/envs/nanoai-geneformer"
+#     # then install Geneformer itself and the weights with the 00_environment scripts, in the
+#     # order printed by:  bash 02_geneformer_in_silico_screen/run_section.sh --print-cluster-plan
+#
+# STATUS OF THE PINS - read before relying on this file.
+# This environment was NOT created from this file, and no GPU stage was rerun for the port.
+# The only check made on the file itself: `pip install --dry-run` of the pip list below under
+# Python 3.10.20 resolves without conflict (132 packages; torch 2.7.1+cu118, transformers 4.46.3,
+# tokenizers 0.20.3, numpy 1.26.4, scanpy 1.11.5). Nothing was installed or imported.
+# Each line carries its source:
+#   [paper]    transcribed from the key resources table of the manuscript: the versions of the
+#              cluster environment that produced the published results. Not verified by a run here.
+#   [script]   the constraint written in 02_geneformer_in_silico_screen/00_environment/*.sh.
+#   [ran X]    the CPU-side steps listed below were actually run on the porting machine with
+#              version X of that package (two local Python 3.10.20 environments, one with
+#              geneformer and torch, one with the scanpy stack), and reproduced the original outputs.
+# Where [paper] and [ran X] differ, the pin is the paper's version and X is what was exercised.
+#
+# CPU-side steps run locally with the [ran X] versions (see 02_geneformer_in_silico_screen/README.md):
+#   01_dataset_preparation: build_geneformer_h5ad_from_10x.py, qc_sweep.py, parse_geo_series_metadata.py
+#   03_in_silico_perturbation: 05_get_perturb_stats_finetuned.py (rescue / delete), 07_biological_candidate_filter_finetuned.py
+#   04_pathway_enrichment/build_detection_table.py, 06_confounders_and_robustness/confound_check_sex_age_drivers.py
+#   figures: umap_all_celltypes_expression.py, umap_excit_ft.py (UMAP of cached embeddings), heatmap_excit_finetuned_cosine_shifts.py
+# Never run for the port: fine-tuning, evaluation, state embeddings, the perturbation arrays (GPU).
+#
+# Known consequence of a version difference: umap_excit_ft.py gives different UMAP coordinates
+# under umap-learn 0.5.12 than the published figure (made with 0.5.9.post2).
+#
+# The original run used two environments: one with Geneformer and PyTorch (GF_PYTHON) and one
+# with the scanpy / harmonypy / scrublet stack (GF_PREP_PYTHON). This file puts both in one.
+# If the solver refuses, split it at the "preparation stack" comment and set GF_PREP_PYTHON.
+name: nanoai-geneformer
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10.18              # [paper]  [ran 3.10.20]
+  - pip
+  - git                         # 00c clones the Geneformer source
+  - pip:
+      - --extra-index-url https://download.pytorch.org/whl/cu118
+      - torch==2.7.1+cu118      # [paper: PyTorch 2.7.1, CUDA 11.8]  [ran 2.11.0, CPU import only]
+      - transformers==4.46.3    # [paper]  [script 00e: 4.46.*]  [ran 4.57.6]
+      - tokenizers>=0.20,<0.22  # [script 00e]
+      - datasets==4.8.5         # [paper]  [ran 4.8.5]
+      - accelerate==1.13.0      # [paper]  [ran 1.13.0]
+      - numpy==1.26.4           # [paper]  [ran 2.2.6]
+      - scipy==1.15.2           # [paper]  [ran 1.15.3]
+      - pandas==2.3.1           # [paper]  [ran 2.3.3]
+      - scikit-learn==1.7.1     # [paper]  [ran 1.7.2]
+      - matplotlib==3.10.5      # [paper]  [ran 3.10.9]
+      - statsmodels==0.14.5     # [paper]  [ran 0.14.6]
+      - umap-learn==0.5.9.post2 # [paper]  [ran 0.5.12: coordinates differ, see above]
+      - gseapy==1.2.1           # [paper]  [ran 1.3.1 in the spectral environment: Enrichr statistics identical]
+      - huggingface_hub>=0.20.0 # [script 00]
+      - einops>=0.6.0           # [script 00]
+      - pyarrow>=12.0.0         # [script 00]  [ran 24.0.0]
+      - peft>=0.11.1            # [script 00e]
+      - bitsandbytes>=0.45.5    # [script 00e]
+      - optuna>=3.6             # [script 00e]
+      - optuna-integration>=3.6 # [script 00e]
+      - ray>=2.6                # [script 00e]
+      - tdigest>=0.5.2          # [script 00e]
+      - tensorboard>=2.15       # [script 00e]
+      - loompy>=3.0             # [script 00e]
+      - hyperopt>=0.2           # [script 00e]
+      - requests
+      # preparation stack (originally a separate environment, GF_PREP_PYTHON)
+      - anndata==0.11.4         # [paper]  [ran 0.11.4]
+      - scanpy==1.11.5          # [paper]  [ran 1.11.5]
+      - harmonypy==2.0.0        # [paper]  [ran 2.0.0]
+      - scrublet==0.2.3         # [paper]  [installed 0.2.3; the step using it was not rerun]
+      - igraph==1.0.0           # [paper: python-igraph 1.0.0]  [installed 1.0.0]
+      - leidenalg==0.11.0       # not in the paper's table  [installed 0.11.0]
+# Geneformer 0.1.0 (V2 release) is not on PyPI. 00_environment/00c_install_geneformer_pkg.sh
+# clones https://huggingface.co/ctheodoris/Geneformer without LFS files and runs
+# `pip install --no-deps`; 00d_download_model_weights.sh downloads Geneformer-V2-104M.
+# The paper's clone is dated May 13, 2026; the scripts do not pin a revision.

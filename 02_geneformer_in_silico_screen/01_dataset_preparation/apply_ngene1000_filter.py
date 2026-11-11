@@ -17,13 +17,18 @@ import pandas as pd
 import scanpy as sc
 from scipy import sparse
 
-BASE = Path("/mnt/d/TBI_SC/Geneformer_TBI")
+# Section path configuration (GF_WORK, GF_GEO, ...): see ../gf_paths.py.
+import os, sys  # noqa: E401
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import gf_paths  # noqa: E402
+
+BASE = Path(gf_paths.GF_WORK)
 IN = BASE / "h5ad/Garza_GSE209552_all_raw_counts_paperQC_annotated.h5ad"
 OUT = BASE / "h5ad/Garza_GSE209552_all_raw_counts_paperQC_nGene1000_annotated.h5ad"
 SUBSET_DIR = BASE / "h5ad/celltype_subsets_paperQC_nGene1000"
 SUBSET_DIR.mkdir(parents=True, exist_ok=True)
 REPORT = BASE / "reports/paperQC_nGene1000_report.txt"
-V2_TOKEN_PKL = Path("/home/riccardo-s/miniconda3/envs/geneformer/lib/python3.10/site-packages/geneformer/token_dictionary_gc104M.pkl")
+V2_TOKEN_PKL = Path(gf_paths.TOKEN_DICT)
 
 PAPER_TOTAL = 15110
 PAPER_TBI = 6806

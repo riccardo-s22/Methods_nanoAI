@@ -48,3 +48,26 @@ fails in the current SciPy). With FLO=1e-6 it reproduces the original 0.613 / 0.
 - svg/wb_swcnt_corr__*.svg (plot_wb_swcnt_corr_truelog.py)
 - log_exp3_peakfit_ratios.txt, exp3_3H_peakfit_ratios.png
 - run_all.sh: how everything was run
+
+## Re-running in this repository
+
+    bash 04_drug_response_prediction/sensitivity_true_log_ratios/run_all.sh [--skip-slow] [--parallel] [--quiet]
+
+It runs from any working directory with no environment variable, reads the shipped cache
+`data/04_drug_response_prediction/chirality_features/exp3_3H_peakfeats.npz` and the 3 h spectra, and
+writes under `results/04_drug_response_prediction/sensitivity_true_log_ratios/` (`RT/` below). Logs go to
+`results/04_drug_response_prediction/logs/`. `../run_section.sh` calls it. The exp2 script listed above
+is in `01_swcnt_blast_classification/sensitivity_true_log_ratios/` and is run by that section's runner.
+
+The file names in the *Files* list above are those of the original working folder. In this repository:
+
+| Original file | Now |
+|---|---|
+| `log_exp3_drug_axis.txt`, `exp3_3H_drug_axis.png`, `svg/exp3_3H_drug_axis__*.svg` | `logs/exp3_drug_axis_truelog.log`, `RT/exp3_3H_drug_axis.png`, `RT/svg/exp3_3H_drug_axis__*.svg` |
+| `log_exp3_perm_power.txt`, `exp3_3H_perm_power.png`, `svg/exp3_3H_perm_power__*.svg` | `logs/exp3_perm_power_truelog.log`, `RT/exp3_3H_perm_power.png`, `RT/svg/exp3_3H_perm_power__*.svg` |
+| `log_exp3_3H_organoid_score.txt`, `exp3_3H_organoid_scores.csv` | `logs/exp3_3H_organoid_score_truelog.log`, `RT/exp3_3H_organoid_scores.csv` (reference copy shipped as `data/04_drug_response_prediction/per_well_scores/exp3_3H_organoid_scores_truelog.csv`) |
+| `svg/wb_swcnt_corr__*.svg` | `RT/svg/wb_swcnt_corr__*.svg`; needs the western-blot workbook, which is not in the repository (`EXP3_WB_XLSX`), otherwise skipped |
+| `log_exp3_peakfit_ratios.txt`, `exp3_3H_peakfit_ratios.png` | `logs/exp3_peakfit_ratios_truelog.log`, `RT/exp3_3H_peakfit_ratios.png` |
+| `log_exp3_peakfit_ratios_checkfloor.txt` | `logs/exp3_peakfit_ratios_truelog__FLO1e-6.log` (run with `FLO=1e-6`; figure in `RT/checkfloor_FLO1e-6/`) |
+
+Commands, inputs, outputs and runtimes of each script are tabulated in `../README.md`.

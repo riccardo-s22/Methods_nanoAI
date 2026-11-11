@@ -2,3 +2,7 @@ __pycache__/
 *.py[cod]
 .ipynb_checkpoints/
 .DS_Store
+
+# Everything a rerun writes. Source data lives in data/ and is never written to.
+results/
+work/

@@ -7,7 +7,12 @@ import pandas as pd
 import scanpy as sc
 from scipy.stats import median_abs_deviation
 
-BASE = Path("/mnt/d/TBI_SC/Geneformer_TBI")
+# Section path configuration (GF_WORK, GF_GEO, ...): see ../gf_paths.py.
+import os, sys  # noqa: E401
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import gf_paths  # noqa: E402
+
+BASE = Path(gf_paths.GF_WORK)
 SRC = BASE / "h5ad/Garza_GSE209552_all_raw_counts_geneformer_ready.h5ad"
 ANN = BASE / "h5ad/Garza_GSE209552_all_raw_counts_paperQC_annotated.h5ad"
 PAPER_TOTAL = 15110; PAPER_TBI = 6806; PAPER_CONTROL = 8304

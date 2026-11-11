@@ -34,6 +34,12 @@ from pathlib import Path
 
 from geneformer import EmbExtractor
 
+# Section path configuration: see ../../gf_paths.py. The MT_RECON defaults used
+# below are a layout chosen for this repository, not the original MT project's.
+import os, sys  # noqa: E401
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+import gf_paths  # noqa: E402
+
 STATE_KEY = "disease_binary"
 EMB_LAYER = -1  # second-to-last layer, per Methods
 FORWARD_BATCH_SIZE = 16
@@ -57,15 +63,15 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument(
         "--model-directory",
-        required=True,
+        default=gf_paths.GF_MT_MODEL,
         help="retained MT checkpoint (published: .../ksplit1/checkpoint-600)",
     )
     ap.add_argument(
         "--input-data-file",
-        required=True,
+        default=gf_paths.MT_RECON["tokenized_train"],
         help="tokenized TRAIN-split .dataset of the depth-matched MT corpus",
     )
-    ap.add_argument("--output-directory", required=True)
+    ap.add_argument("--output-directory", default=gf_paths.MT_RECON["state_embs_dir"])
     ap.add_argument("--output-prefix", default="garza_mt_state_embs")
     ap.add_argument("--nproc", type=int, default=8)
     args = ap.parse_args()

@@ -25,6 +25,9 @@ from pathlib import Path
 
 # Local helpers
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+# finetuned_celltype_config.py sits in 02_model_finetuning/ft_excitatory in this
+# repository (the scripts were written for one flat scripts/ folder).
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "02_model_finetuning" / "ft_excitatory"))
 from finetuned_celltype_config import CELLTYPE_CONFIG, get_config
 from perturb_safeguards import (
     RunSpec,

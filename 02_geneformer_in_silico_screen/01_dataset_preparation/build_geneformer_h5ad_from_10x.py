@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Build a merged raw-counts .h5ad for Geneformer from the snRNA-seq GSE209552 samples.
 
-Reads barcodes/features/matrix directly from /mnt/d/TBI_SC/GSE209552_RAW (NTFS — no symlinks)
+Reads barcodes/features/matrix directly from $GF_GEO/GSE209552_RAW (NTFS — no symlinks)
 to avoid the symlink-organization step on Windows-mounted drives.
 """
 import gzip
@@ -16,8 +16,13 @@ import scanpy as sc
 from scipy import io as sio
 from scipy import sparse
 
-BASE = Path("/mnt/d/TBI_SC/Geneformer_TBI")
-RAW = Path("/mnt/d/TBI_SC/GSE209552_RAW")
+# Section path configuration (GF_WORK, GF_GEO, ...): see ../gf_paths.py.
+import os, sys  # noqa: E401
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import gf_paths  # noqa: E402
+
+BASE = Path(gf_paths.GF_WORK)
+RAW = Path(gf_paths.GEO_RAW)
 MANIFEST = BASE / "reports/snrna_sample_manifest.txt"
 META = BASE / "metadata/gse209552_sample_metadata_curated.tsv"
 OUTDIR = BASE / "h5ad"

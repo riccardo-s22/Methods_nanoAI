@@ -31,6 +31,12 @@ import numpy as np
 import pandas as pd
 import scanpy as sc
 
+# Section path configuration: see ../../gf_paths.py. The MT_RECON defaults used
+# below are a layout chosen for this repository, not the original MT project's.
+import os, sys  # noqa: E401
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+import gf_paths  # noqa: E402
+
 SEED = 42
 VALID_FRACTION = 0.20
 N_HOLDOUT_PER_CLASS = 1
@@ -74,8 +80,9 @@ def choose_holdout_donors(obs: pd.DataFrame) -> tuple[str, str]:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--in-h5ad", required=True, help="depth-matched MT corpus")
-    ap.add_argument("--out-h5ad", required=True)
+    ap.add_argument("--in-h5ad", default=gf_paths.MT_RECON["depth_matched_h5ad"],
+                    help="depth-matched MT corpus")
+    ap.add_argument("--out-h5ad", default=gf_paths.MT_RECON["split_h5ad"])
     ap.add_argument("--seed", type=int, default=SEED)
     args = ap.parse_args()
 
